@@ -16,7 +16,6 @@ This software implements a ROS 2 node for collision avoidance control of robots 
 - ROS2 : Humble
 
 ### System Dependencies
-- [path_smoother](https://github.com/Arcanain/path_smoother) 
 - [arcanain_simulator](https://github.com/Arcanain/arcanain_simulator) 
 
 ## How To Use
@@ -34,12 +33,12 @@ dwa_planner/
 │   └── pure_pursuit_planner/              - Header files for the pure_pursuit_planner package
 │       └── pure_pursuit_planner_component.hpp - Header file for the Pure Pursuit planner component
 ├── launch/                                - Directory for ROS 2 launch files
-│   └── pure_pursuit_planner.py            - Launch script for the pure_pursuit_planner node
+│   └── dwa_planner.py            - Launch script for the pure_pursuit_planner node
 ├── rviz/                                  - Directory for RViz configuration files
-│   └── pure_pursuit_planner.rviz          - RViz configuration file for the Pure Pursuit planner
+│   └── dwa_planner.rviz          - RViz configuration file for the Pure Pursuit planner
 ├── src/                                   - Directory for source files
-│   ├── pure_pursuit_planner_component.cpp - Implementation of the Pure Pursuit planner component
-│   └── pure_pursuit_planner_node.cpp      - Node implementation for the Pure Pursuit planner
+│   ├── dwa_noe.cpp - Implementation of the Pure Pursuit planner component
+│   └── dwa_planner_node.cpp      - Node implementation for the Pure Pursuit planner
 ├── CMakeLists.txt                         - CMake build configuration file
 └── package.xml                            - ROS 2 package metadata file
 ```
