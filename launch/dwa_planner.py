@@ -10,7 +10,7 @@ from launch_ros.substitutions import FindPackageShare
 def generate_launch_description():
     package_name = 'dwa_planner'
     simulator_package = 'arcanain_simulator'
-    rviz_file_name = "mpc_cbf_planner.rviz"
+    rviz_file_name = "dwa_planner.rviz"
 
     file_path = os.path.expanduser('~/ros2_ws/src/arcanain_simulator/urdf/mobile_robot.urdf.xml')
 
