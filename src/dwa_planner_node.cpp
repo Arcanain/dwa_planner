@@ -22,7 +22,8 @@ DWAPlannerNode::DWAPlannerNode()
   received_odom_(false)
 {
   // デフォルトパラメータ
-  kinematic_ = {1.0, toRadian(20.0), 0.2, toRadian(50.0), 0.01, toRadian(1.0)};
+//   kinematic_ = {1.0, toRadian(20.0), 0.2, toRadian(50.0), 0.01, toRadian(1.0)};
+  kinematic_ = {0.5, toRadian(20.0), 0.1, toRadian(50.0), 0.01, toRadian(1.0)};
   eval_param_ = {0.1, 0.08, 0.1, 3.0};
 
   // Subscriber
@@ -100,7 +101,9 @@ void DWAPlannerNode::odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg)
   x_[3] = msg->twist.twist.linear.x;
   x_[4] = msg->twist.twist.angular.z;
 
-  received_odom_ = true;
+  if(!x_.empty()) {
+    received_odom_ = true;
+  }
 }
 
 void DWAPlannerNode::local_obstacle_callback(const visualization_msgs::msg::MarkerArray::SharedPtr msg)
@@ -113,6 +116,7 @@ void DWAPlannerNode::local_obstacle_callback(const visualization_msgs::msg::Mark
       obstacle_.push_back({ox, oy});
     }
   }
+
   if(!obstacle_.empty()){
     received_obstacles_ = true;
   }
@@ -124,7 +128,10 @@ void DWAPlannerNode::target_callback(const geometry_msgs::msg::PoseStamped::Shar
   goal_[1] = msg->pose.position.y;
 
   RCLCPP_INFO(get_logger(), "New goal set: (%.2f, %.2f)", goal_[0], goal_[1]);
-  received_goal_ = true;
+
+  if(!goal_.empty()) {
+    received_goal_ = true;
+  }
 }
 
 void DWAPlannerNode::send_static_transform()
