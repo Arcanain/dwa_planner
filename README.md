@@ -82,38 +82,45 @@ dwa_planner/
 
 ```mermaid
 classDiagram
-    class PurePursuitNode {
-        +PurePursuitNode()
-        -void updateControl()
-        -std::pair<double, double> purePursuitControl(int&)
-        -std::pair<int, double> searchTargetIndex()
-        -double calcDistance(double, double) const
-        -void odometry_callback(nav_msgs::msg::Odometry::SharedPtr)
-        -void path_callback(nav_msgs::msg::Path::SharedPtr)
-        -void publishCmd(double, double)
-        -rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr cmd_vel_pub
-        -rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_sub
-        -rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr path_sub
-        -rclcpp::TimerBase::SharedPtr timer
-        -std::vector<double> cx
-        -std::vector<double> cy
-        -std::vector<double> cyaw
-        -std::vector<double> ck
-        -double x, y, yaw, v, w
-        -int target_ind
-        -int oldNearestPointIndex
-        -double target_vel
-        -double current_vel
-        -bool path_subscribe_flag
-        -double goal_threshold
-        -const double k
-        -const double Lfc
-        -const double Kp
-        -const double dt
-        -double minCurvature
-        -double maxCurvature
-        -double minVelocity
-        -double maxVelocity
+    class DWA {
+        +DynamicWindowApproach(x, model, goal, evalParam, ob, R, robotR) : vector<double>
+        -CalcDynamicWindow(x, model) : array<double, 4>
+        -GenerateTrajectory(x, vt, ot, evaldt) : array<double, 5>
+        -CalcHeadingEval(x, goal) : double
+        -CalcDistEval(x, ob, R, robotR) : double
+        -NormalizeEval(evalDB) : void
+        -SelectBestControl(evalDB, evalParam) : vector<double>
+    }
+
+    class DWAPlannerNode {
+        +DWAPlannerNode()
+        +~DWAPlannerNode()
+        -timerCallback() : void
+        -odomCallback(msg) : void
+        -local_obstacle_callback(msg) : void
+        -target_callback(msg) : void
+        -send_static_transform() : void
+        -x_ : array<double, 5>
+        -goal_ : array<double, 2>
+        -obstacle_ : vector<array<double, 2>>
+        -kinematic_ : array<double, 6>
+        -eval_param_ : array<double, 4>
+        -robot_radius_ : double
+        -obstacle_radius_ : double
+        -received_obstacles_ : bool
+        -received_goal_ : bool
+        -received_odom_ : bool
+    }
+
+    DWAPlannerNode "1" --> "1" DWA : Uses
+    DWAPlannerNode o-- rclcpp::Node : Extends
+    rclcpp::Node <|-- DWAPlannerNode
+
+    DWA : <<static_methods_only>>
+
+    %% Other related components
+    class rclcpp::Node {
+        <<library>>
     }
 ```
 
@@ -121,33 +128,31 @@ classDiagram
 
 ```mermaid
 flowchart TD
-    A[Start] --> B[Initialize ROS 2 Node: pure_pursuit_planner]
-    B --> C[Create Publishers and Subscribers]
-    C --> D[Enter Timer Callback Loop]
-    D --> E[Update Control]
-    E --> F[Pure Pursuit Control]
-    F --> G[Publish Command Velocity]
-    G --> H[Check if Goal is Reached]
-    H -->|No| I[Continue Path Tracking]
-    H -->|Yes| J[Stop the Robot]
-    I --> D
-    J --> K[End]
-
-    subgraph PurePursuitNode
-        L[Constructor: Initialize Node, Topics, and Parameters]
-        M[odometry_callback: Update Robot State]
-        N[path_callback: Receive and Process Path]
-        O[updateControl: Timer Callback for Control Update]
-        P[purePursuitControl: Calculate Steering and Velocity]
-        Q[publishCmd: Publish Velocity Command to cmd_vel]
-    end
-
-    L --> M
-    L --> N
-    M --> O
-    N -.-> O
-    O --> P
-    P --> Q
+    Start["Start: DWAPlannerNode Initialized"] --> CheckOdom
+    CheckOdom{"Received Odometry?"}
+    CheckOdom -->|No| WaitOdom[Display "Waiting for /odom..."]
+    WaitOdom --> CheckOdom
+    CheckOdom -->|Yes| CheckObstacles{"Received Obstacles?"}
+    
+    CheckObstacles -->|No| WaitObstacles[Display "Waiting for local_obstacle_markers..."]
+    WaitObstacles --> CheckObstacles
+    CheckObstacles -->|Yes| CheckGoal{"Received Goal?"}
+    
+    CheckGoal -->|No| WaitGoal[Display "Waiting for /waypoint..."]
+    WaitGoal --> CheckGoal
+    CheckGoal -->|Yes| ComputeDWA
+    
+    ComputeDWA["Call DWA::DynamicWindowApproach"] --> EvaluateDynamicWindow
+    EvaluateDynamicWindow["CalcDynamicWindow"] --> EvaluateTrajectories
+    EvaluateTrajectories["GenerateTrajectory for Each (vt, ot)"] --> EvaluateMetrics
+    EvaluateMetrics["CalcHeadingEval, CalcDistEval, CalcVel"] --> FilterValidPaths
+    FilterValidPaths{"Valid Paths Available?"}
+    FilterValidPaths -->|No| NoPath[Display "No path to goal! Return [0.0, 0.0]"]
+    FilterValidPaths -->|Yes| NormalizeEvals
+    
+    NormalizeEvals["NormalizeEval"] --> SelectBest
+    SelectBest["SelectBestControl"] --> PublishCommand
+    PublishCommand["Publish /cmd_vel Command"] --> End["End"]
 
 ```
 
