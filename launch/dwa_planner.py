@@ -45,17 +45,17 @@ def generate_launch_description():
         parameters=[{'joint_state_publisher': robot_description}]
     )
 
-    # dwa_planner_node = Node(
-    #     package=package_name,
-    #     executable='dwa_planner',
-    #     output="screen",
-    # )
-
     dwa_planner_node = Node(
         package=package_name,
-        executable='dwa_node',
+        executable='dwa_planner',
         output="screen",
     )
+
+    # dwa_planner_node = Node(
+    #     package=package_name,
+    #     executable='dwa_node',
+    #     output="screen",
+    # )
 
     odometry_pub_node = Node(
         package=simulator_package,
