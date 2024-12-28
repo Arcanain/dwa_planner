@@ -24,18 +24,17 @@ inline double toDegree(double radian) {
   return radian / M_PI * 180.0;
 }
 
-// ロボット状態
-struct RobotState {
-  double x;
-  double y;
-  double yaw;
-  double v;
-  double w;
-};
-
 // DWAプランナーをC++で実装
 class DWA {
 public:
+  // DynamicWindowApproach
+  //   x         : [x, y, yaw, v, w] (現在状態)
+  //   model     : [max_vel, max_omega, accel, accel_omega, v_reso, w_reso]
+  //   goal      : [goal_x, goal_y]
+  //   evalParam : [heading_gain, dist_gain, vel_gain, predict_dt]
+  //   ob        : 障害物座標群 ([x, y])
+  //   R, robotR : 障害物半径, ロボット半径
+  // 戻り値： [v, w]
   static std::vector<double> DynamicWindowApproach(
     const std::array<double,5> &x,
     const std::array<double,6> &model,
