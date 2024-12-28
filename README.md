@@ -26,7 +26,7 @@ source ~/ros2_ws/install/setup.bash
 ros2 launch dwa_planner dwa_planner.py
 ```
 
-### Folder Structure
+### Directory
 ```
 dwa_planner/
 ├── CMakeLists.txt                         - CMake build configuration file for the DWA planner
