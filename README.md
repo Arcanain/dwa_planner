@@ -29,18 +29,20 @@ ros2 launch dwa_planner dwa_planner.py
 ### Folder Structure
 ```
 dwa_planner/
-├── include/                               - Directory for header files
-│   └── pure_pursuit_planner/              - Header files for the pure_pursuit_planner package
-│       └── pure_pursuit_planner_component.hpp - Header file for the Pure Pursuit planner component
+├── CMakeLists.txt                         - CMake build configuration file for the DWA planner
+├── package.xml                            - ROS 2 package metadata file
+├── config/                                - Directory for YAML parameter/config files
+│   └── dwa_params.yaml                    - YAML file specifying DWA parameters (max_vel, etc.)
 ├── launch/                                - Directory for ROS 2 launch files
-│   └── dwa_planner.py            - Launch script for the pure_pursuit_planner node
-├── rviz/                                  - Directory for RViz configuration files
-│   └── dwa_planner.rviz          - RViz configuration file for the Pure Pursuit planner
-├── src/                                   - Directory for source files
-│   ├── dwa_noe.cpp - Implementation of the Pure Pursuit planner component
-│   └── dwa_planner_node.cpp      - Node implementation for the Pure Pursuit planner
-├── CMakeLists.txt                         - CMake build configuration file
-└── package.xml                            - ROS 2 package metadata file
+│   └── dwa_planner.launch.py              - Launch script for the DWA planner node and parameter loading
+├── include/                               - Directory for header files
+│   └── dwa_planner/                       - Header files for the dwa_planner package
+│       ├── dwa_planner_component.hpp      - Header file for the DWA planner core component (algorithm)
+│       └── dwa_planner_node.hpp           - Header file for the DWA planner ROS Node
+└── src/                                   - Directory for source files
+    ├── dwa_planner_component.cpp          - Implementation of the DWA planner core (algorithm)
+    ├── dwa_planner_node.cpp               - Node implementation for the DWA planner, handling ROS interfaces
+    └── dwa_planner.cpp                    - Main entry point (executable) that spins the dwa_planner node
 ```
 
 ## Interface Table
