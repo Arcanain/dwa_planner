@@ -55,6 +55,7 @@ public:
         double dist = CalcDistEval(xt, ob, R, robotR);
         double vel = std::fabs(vt);
 
+        // 衝突していればスキップ
         if (dist < 0) continue;
 
         evalDB.push_back({vt, ot, heading, dist, vel});
@@ -144,12 +145,12 @@ public:
 
     cmd_vel_pub_ = this->create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
 
-    // ★追加: local_obstacle_markersをsubscribe
+    // local_obstacle_markersをsubscribe
     local_obstacle_sub_ = this->create_subscription<visualization_msgs::msg::MarkerArray>(
       "local_obstacle_markers", 10,
       std::bind(&DWAPlannerNode::local_obstacle_callback, this, std::placeholders::_1));
 
-    // ★ 目標位置(waypoint)をSubscribe (PoseStamped)
+    // 目標位置(waypoint)をSubscribe (PoseStamped)
     target_sub_ = this->create_subscription<geometry_msgs::msg::PoseStamped>(
       "waypoint", 10, 
       std::bind(&DWAPlannerNode::target_callback, this, std::placeholders::_1));
@@ -164,6 +165,23 @@ public:
 
 private:
   void timerCallback() {
+    // --- (1) 障害物が来ていない or ゴールが来ていない場合はスキップ
+    if(!received_obstacles_){
+      RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 2000,
+         "No obstacle info yet. Waiting for local_obstacle_markers...");
+      return;
+    }
+    if(!received_goal_){
+      RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 2000,
+         "No goal info yet. Waiting for /waypoint...");
+      return;
+    }
+    if(!received_odom_){
+      RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 2000,
+         "No goal info yet. Waiting for /odom...");
+      return;
+    }
+
     auto u = DWA::DynamicWindowApproach(x_, kinematic_, goal_, eval_param_, obstacle_, obstacle_radius_, robot_radius_);
 
     geometry_msgs::msg::Twist cmd;
@@ -190,6 +208,11 @@ private:
     // velocity
     x_[3] = msg->twist.twist.linear.x;
     x_[4] = msg->twist.twist.angular.z;
+
+    // received_odom_ = true;
+    if(!x_.empty()) {
+      received_odom_ = true;
+    }
   }
 
   void local_obstacle_callback(const visualization_msgs::msg::MarkerArray::SharedPtr msg)
@@ -211,6 +234,10 @@ private:
     for (auto & obs : obstacle_) {
       RCLCPP_INFO(this->get_logger(), "Obstacle position: (%.2f, %.2f)", obs[0], obs[1]);
     }
+
+    if(!obstacle_.empty()) {
+      received_obstacles_ = true; // 初めて障害物を取得
+    }
   }
 
   // ★ 目標位置(PoseStamped)コールバック
@@ -222,6 +249,11 @@ private:
 
     // ログ出力など必要なら
     RCLCPP_INFO(this->get_logger(), "New goal set: (%.2f, %.2f)", goal_[0], goal_[1]);
+
+    // received_goal_ = true;
+    if(!goal_.empty()) {
+      received_goal_ = true;
+    }
   }
 
   void send_static_transform()
@@ -246,15 +278,16 @@ private:
   rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr target_sub_;
   rclcpp::TimerBase::SharedPtr timer_;
   std::shared_ptr<tf2_ros::StaticTransformBroadcaster> static_broadcaster_;
-  std::array<double,5> x_ = {0.0, 0.0, M_PI/2.0, 0.0, 0.0};
-  // std::array<double,2> goal_;
-  // std::array<double,2> goal_ = {10.0, 10.0};
-  std::array<double,2> goal_ = {6.0, 6.0};
+  std::array<double,5> x_ = {0.0, 0.0, 0.0, 0.0, 0.0};
+  std::array<double,2> goal_ = {0.0, 0.0};
   std::vector<std::array<double,2>> obstacle_;
   std::array<double,6> kinematic_ = {1.0, toRadian(20), 0.2, toRadian(50), 0.01, toRadian(1)};
   std::array<double,4> eval_param_ = {0.1, 0.08, 0.1, 3.0};
   double robot_radius_;
   double obstacle_radius_;
+  bool received_obstacles_ = false;
+  bool received_goal_ = false;
+  bool received_odom_ = false;
 };
 
 int main(int argc, char *argv[]) {
