@@ -51,12 +51,6 @@ def generate_launch_description():
         output="screen",
     )
 
-    # dwa_planner_node = Node(
-    #     package=package_name,
-    #     executable='dwa_node',
-    #     output="screen",
-    # )
-
     odometry_pub_node = Node(
         package=simulator_package,
         executable='odometry_pub',
