@@ -126,105 +126,44 @@ classDiagram
 
 ```mermaid
 flowchart TD
-    A[Start] --> B[Initialize ROS 2 Node: pure_pursuit_planner]
-    B --> C[Create Publishers and Subscribers]
-    C --> D[Enter Timer Callback Loop]
-    D --> E[Update Control]
-    E --> F[Pure Pursuit Control]
-    F --> G[Publish Command Velocity]
-    G --> H[Check if Goal is Reached]
-    H -->|No| I[Continue Path Tracking]
-    H -->|Yes| J[Stop the Robot]
-    I --> D
-    J --> K[End]
-
-    subgraph PurePursuitNode
-        L[Constructor: Initialize Node, Topics, and Parameters]
-        M[odometry_callback: Update Robot State]
-        N[path_callback: Receive and Process Path]
-        O[updateControl: Timer Callback for Control Update]
-        P[purePursuitControl: Calculate Steering and Velocity]
-        Q[publishCmd: Publish Velocity Command to cmd_vel]
+    subgraph DWAPlannerNode
+        A[Start] --> B[Initialize ROS 2 Node: dwa_planner]
+        B --> C[Create Publishers and Subscribers]
+        K[odomCallback: Update Robot State]
+        L[local_obstacle_callback: Update Obstacles]
+        M[target_callback: Update Target Goal]
+        N[timerCallback: Loop Update Control]
+        N --> E[Check if Data is Received]
+        E -->|No| F[Wait for Required Topics]
+        E -->|Yes| G[Compute Control Using DWA]
+        V[publishCmd: Publish Velocity Command]
+        I[End Timer Callback]
+        F --> N
     end
 
-    L --> M
+    subgraph DWA
+        O[DynamicWindowApproach: DWA Computation]
+        P[CalcDynamicWindow: Calculate Velocity and Angular Range]
+        Q[GenerateTrajectory: Generate Possible Trajectories]
+        R[CalcHeadingEval: Evaluate Heading]
+        S[CalcDistEval: Evaluate Distance to Obstacles]
+        T[NormalizeEval: Normalize Evaluations]
+        U[SelectBestControl: Choose Best Control]
+    end
+
+    C --> K
+    C --> L
+    C --> M
+    K --> N
     L --> N
-    M --> O
-    N -.-> O
+    M --> N
+    G --> O
     O --> P
     P --> Q
-
-```
-
-## System architecture
-
-```mermaid
-classDiagram
-    class PathPublisher {
-        +PathPublisher()
-        +void loadPathData(string&)
-        +void publishPath()
-        -rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr path_pub_
-        -rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr visualize_path_pub_
-        -rclcpp::TimerBase::SharedPtr timer_
-        -nav_msgs::msg::Path path_
-        -nav_msgs::msg::Path visualize_path_
-    }
-    
-    class PurePursuitNode {
-        +PurePursuitNode()
-        -void updateControl()
-        -std::pair<double, double> purePursuitControl(int&)
-        -std::pair<int, double> searchTargetIndex()
-        -double calcDistance(double, double) const
-        -void odometry_callback(nav_msgs::msg::Odometry::SharedPtr)
-        -void path_callback(nav_msgs::msg::Path::SharedPtr)
-        -void publishCmd(double, double)
-        -rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr cmd_vel_pub
-        -rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_sub
-        -rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr path_sub
-        -rclcpp::TimerBase::SharedPtr timer
-        -std::vector<double> cx
-        -std::vector<double> cy
-        -std::vector<double> cyaw
-        -std::vector<double> ck
-        -double x, y, yaw, v, w
-        -int target_ind
-        -int oldNearestPointIndex
-        -double target_vel
-        -double current_vel
-        -bool path_subscribe_flag
-        -double goal_threshold
-        -const double k
-        -const double Lfc
-        -const double Kp
-        -const double dt
-        -double minCurvature
-        -double maxCurvature
-        -double minVelocity
-        -double maxVelocity
-    }
-
-    PathPublisher --|> PurePursuitNode: path_
-
-    class OdometryPublisher {
-        -rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_pub
-        -rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr path_pub
-        -rclcpp::Publisher<nav_msgs::msg::OccupancyGrid>::SharedPtr localmap_pub
-        -rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr laser_range_pub
-        -rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr cmd_vel_subscriber
-        -std::shared_ptr<tf2_ros::TransformBroadcaster> odom_broadcaster
-        -std::shared_ptr<tf2_ros::StaticTransformBroadcaster> static_broadcaster_
-        -rclcpp::TimerBase::SharedPtr timer_
-        -nav_msgs::msg::Path path
-        -double x, y, th, vx, vth
-        -rclcpp::Time current_time, last_time
-        +OdometryPublisher()
-        -void cmd_vel_callback(const geometry_msgs::msg::Twist::SharedPtr)
-        -void timer_callback()
-        -void send_static_transform()
-    }
-
-    PurePursuitNode --|> OdometryPublisher: v, w
-    OdometryPublisher --|> PurePursuitNode: x, y, th
+    Q --> R
+    R --> S
+    S --> T
+    T --> U
+    U --> V
+    V --> I
 ```
