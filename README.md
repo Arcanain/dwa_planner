@@ -48,6 +48,12 @@ dwa_planner/
 ```
 
 ## How To Build & Test
+
+### Step0: Prepare
+```bash
+sudo apt install lcov
+```
+
 ### Step1: build
 ```bash
 cd ~/ros2_ws
