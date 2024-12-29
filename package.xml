@@ -17,6 +17,11 @@
   <depend>tf2_geometry_msgs</depend>
   <depend>tf2_ros</depend>
   
+  <!-- ★テストに必要 -->
+  <test_depend>ament_cmake_gtest</test_depend>
+  <!-- カバレッジ計測 -->
+  <test_depend>lcov</test_depend>
+
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
 

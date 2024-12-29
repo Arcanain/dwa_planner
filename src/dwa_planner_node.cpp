@@ -54,34 +54,37 @@ DWAPlannerNode::DWAPlannerNode()
 
 void DWAPlannerNode::timerCallback()
 {
-  if(!received_odom_){
-    RCLCPP_INFO_THROTTLE(get_logger(), *get_clock(), 2000,
+  if (!received_odom_) {
+    RCLCPP_INFO_THROTTLE(
+      get_logger(), *get_clock(), 2000,
       "Waiting for /odom...");
     return;
   }
-  if(!received_obstacles_){
-    RCLCPP_INFO_THROTTLE(get_logger(), *get_clock(), 2000,
+  if (!received_obstacles_) {
+    RCLCPP_INFO_THROTTLE(
+      get_logger(), *get_clock(), 2000,
       "Waiting for local_obstacle_markers...");
     return;
   }
-  if(!received_goal_){
-    RCLCPP_INFO_THROTTLE(get_logger(), *get_clock(), 2000,
+  if (!received_goal_) {
+    RCLCPP_INFO_THROTTLE(
+      get_logger(), *get_clock(), 2000,
       "Waiting for /waypoint...");
     return;
   }
 
   // DWA計算
   auto u = DWA::DynamicWindowApproach(
-    x_, 
-    kinematic_, 
-    goal_, 
+    x_,
+    kinematic_,
+    goal_,
     eval_param_,
-    obstacle_, 
-    obstacle_radius_, 
+    obstacle_,
+    obstacle_radius_,
     robot_radius_);
 
   geometry_msgs::msg::Twist cmd;
-  cmd.linear.x  = u[0];
+  cmd.linear.x = u[0];
   cmd.angular.z = u[1];
   cmd_vel_pub_->publish(cmd);
 }
@@ -101,23 +104,24 @@ void DWAPlannerNode::odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg)
   x_[3] = msg->twist.twist.linear.x;
   x_[4] = msg->twist.twist.angular.z;
 
-  if(!x_.empty()) {
+  if (!x_.empty()) {
     received_odom_ = true;
   }
 }
 
-void DWAPlannerNode::local_obstacle_callback(const visualization_msgs::msg::MarkerArray::SharedPtr msg)
+void DWAPlannerNode::local_obstacle_callback(
+  const visualization_msgs::msg::MarkerArray::SharedPtr msg)
 {
   obstacle_.clear();
-  for(const auto &marker : msg->markers){
-    if(marker.type == visualization_msgs::msg::Marker::CYLINDER){
+  for (const auto & marker : msg->markers) {
+    if (marker.type == visualization_msgs::msg::Marker::CYLINDER) {
       double ox = marker.pose.position.x;
       double oy = marker.pose.position.y;
       obstacle_.push_back({ox, oy});
     }
   }
 
-  if(!obstacle_.empty()){
+  if (!obstacle_.empty()) {
     received_obstacles_ = true;
   }
 }
@@ -129,7 +133,7 @@ void DWAPlannerNode::target_callback(const geometry_msgs::msg::PoseStamped::Shar
 
   RCLCPP_INFO(get_logger(), "New goal set: (%.2f, %.2f)", goal_[0], goal_[1]);
 
-  if(!goal_.empty()) {
+  if (!goal_.empty()) {
     received_goal_ = true;
   }
 }
@@ -140,13 +144,13 @@ void DWAPlannerNode::send_static_transform()
   static_transform_stamped.header.stamp = now();
   static_transform_stamped.header.frame_id = "map";
   static_transform_stamped.child_frame_id = "odom";
-  static_transform_stamped.transform.translation.x=0.0;
-  static_transform_stamped.transform.translation.y=0.0;
-  static_transform_stamped.transform.translation.z=0.0;
-  static_transform_stamped.transform.rotation.x=0.0;
-  static_transform_stamped.transform.rotation.y=0.0;
-  static_transform_stamped.transform.rotation.z=0.0;
-  static_transform_stamped.transform.rotation.w=1.0;
+  static_transform_stamped.transform.translation.x = 0.0;
+  static_transform_stamped.transform.translation.y = 0.0;
+  static_transform_stamped.transform.translation.z = 0.0;
+  static_transform_stamped.transform.rotation.x = 0.0;
+  static_transform_stamped.transform.rotation.y = 0.0;
+  static_transform_stamped.transform.rotation.z = 0.0;
+  static_transform_stamped.transform.rotation.w = 1.0;
 
   static_broadcaster_->sendTransform(static_transform_stamped);
 }
