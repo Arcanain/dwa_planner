@@ -111,6 +111,10 @@ xdg-open coverage_html/index.html
 | `DT`                    | `const double`                         | Time step for computations                    |
 | `DWA`                   | `class`                                | DWA computation instance                      |
 
+## System architecture
+
+![dwa_architecture](https://github.com/Arcanain/dwa_planner/blob/feature/unit_test/images/system_architecture.svg)
+
 ## Software architecture
 
 ### Class Diagram
