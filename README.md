@@ -80,39 +80,46 @@ dwa_planner/
 
 ```mermaid
 classDiagram
-    class PurePursuitNode {
-        +PurePursuitNode()
-        -void updateControl()
-        -std::pair<double, double> purePursuitControl(int&)
-        -std::pair<int, double> searchTargetIndex()
-        -double calcDistance(double, double) const
-        -void odometry_callback(nav_msgs::msg::Odometry::SharedPtr)
-        -void path_callback(nav_msgs::msg::Path::SharedPtr)
-        -void publishCmd(double, double)
-        -rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr cmd_vel_pub
-        -rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_sub
-        -rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr path_sub
-        -rclcpp::TimerBase::SharedPtr timer
-        -std::vector<double> cx
-        -std::vector<double> cy
-        -std::vector<double> cyaw
-        -std::vector<double> ck
-        -double x, y, yaw, v, w
-        -int target_ind
-        -int oldNearestPointIndex
-        -double target_vel
-        -double current_vel
-        -bool path_subscribe_flag
-        -double goal_threshold
-        -const double k
-        -const double Lfc
-        -const double Kp
-        -const double dt
-        -double minCurvature
-        -double maxCurvature
-        -double minVelocity
-        -double maxVelocity
+    class DWA {
+        +DynamicWindowApproach(x, model, goal, evalParam, ob, R, robotR) : vector<double>
+        -CalcDynamicWindow(x, model) : array<double, 4>
+        -GenerateTrajectory(x, vt, ot, evaldt) : array<double, 5>
+        -CalcHeadingEval(x, goal) : double
+        -CalcDistEval(x, ob, R, robotR) : double
+        -NormalizeEval(evalDB) : void
+        -SelectBestControl(evalDB, evalParam) : vector<double>
     }
+    class DWAPlannerNode {
+        +DWAPlannerNode()
+        +~DWAPlannerNode()
+        -timerCallback() : void
+        -odomCallback(msg) : void
+        -local_obstacle_callback(msg) : void
+        -target_callback(msg) : void
+        -send_static_transform() : void
+        -odom_sub_ : Subscription<nav_msgs::msg::Odometry>
+        -local_obstacle_sub_ : Subscription<visualization_msgs::msg::MarkerArray>
+        -target_sub_ : Subscription<geometry_msgs::msg::PoseStamped>
+        -cmd_vel_pub_ : Publisher<geometry_msgs::msg::Twist>
+        -timer_ : TimerBase
+        -static_broadcaster_ : StaticTransformBroadcaster
+        -x_ : array<double, 5>
+        -goal_ : array<double, 2>
+        -obstacle_ : vector<array<double, 2>>
+        -kinematic_ : array<double, 6>
+        -eval_param_ : array<double, 4>
+        -robot_radius_ : double
+        -obstacle_radius_ : double
+        -received_obstacles_ : bool
+        -received_goal_ : bool
+        -received_odom_ : bool
+    }
+    class rclcppNode {
+        <<library>>
+    }
+
+    DWAPlannerNode o-- DWA : Uses
+    DWAPlannerNode <|-- rclcppNode : Extends
 ```
 
 ### Flowchart
