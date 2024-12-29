@@ -39,6 +39,10 @@ dwa_planner/
 ├── src/                                   - Directory for source files
 │   ├── dwa_noe.cpp - Implementation of the Pure Pursuit planner component
 │   └── dwa_planner_node.cpp      - Node implementation for the Pure Pursuit planner
+├── test/
+│   ├── test_dwa_component.cpp             - Unit test
+│   ├── test_dwa_node.cpp                  - Integration test
+│   └── test_utils.hpp                     - Utility
 ├── CMakeLists.txt                         - CMake build configuration file
 └── package.xml                            - ROS 2 package metadata file
 ```
