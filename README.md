@@ -175,3 +175,26 @@ flowchart TD
     U --> V
     V --> I
 ```
+
+## How To Test
+### Step1: build
+```bash
+cd ~/ros2_ws
+colcon build --packages-select dwa_planner --cmake-args -DCMAKE_CXX_FLAGS="--coverage"
+```
+
+### Step2: test
+```bash
+cd ~/ros2_ws
+colcon test --packages-select dwa_planner
+colcon test-result --verbose
+```
+
+### Step3: create coverage report
+```bash
+cd ~/ros2_ws/build/dwa_planner
+lcov --directory . --capture --output-file coverage.info
+lcov --remove coverage.info '/usr/*' '/opt/ros/*' '*/test/*' --output-file coverage.filtered.info
+genhtml coverage.filtered.info --output-directory coverage_html --branch-coverage
+xdg-open coverage_html/index.html
+```
