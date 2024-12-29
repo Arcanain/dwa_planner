@@ -42,13 +42,13 @@ private:
   std::shared_ptr<tf2_ros::StaticTransformBroadcaster> static_broadcaster_;
 
   // States
-  std::array<double,5> x_;
-  std::array<double,2> goal_;
-  std::vector<std::array<double,2>> obstacle_;
+  std::array<double, 5> x_;
+  std::array<double, 2> goal_;
+  std::vector<std::array<double, 2>> obstacle_;
 
   // DWA param
-  std::array<double,6> kinematic_;
-  std::array<double,4> eval_param_;
+  std::array<double, 6> kinematic_;
+  std::array<double, 4> eval_param_;
 
   double robot_radius_;
   double obstacle_radius_;
