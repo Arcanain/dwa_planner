@@ -47,32 +47,36 @@ dwa_planner/
 
 ### Input
 
-| Variable Name      | Type            | Description                         |
-|-------------------------|-------------------|---------------------------------------|
-| `odom`                  | `nav_msgs::msg::Odometry` | Odometry information of the robot |
-| `tgt_path`              | `nav_msgs::msg::Path` | Target trajectory of the robot |
+| Variable Name           | Type                                    | Description                                   |
+|--------------------------|-----------------------------------------|-----------------------------------------------|
+| `odom`                  | `nav_msgs::msg::Odometry`              | Odometry information of the robot             |
+| `local_obstacle_markers`| `visualization_msgs::msg::MarkerArray` | Local obstacles around the robot              |
+| `waypoint`              | `geometry_msgs::msg::PoseStamped`      | Target goal position for the robot            |
 
 ### Output
 
-| Variable Name      | Type            | Description                         |
-|-------------------------|-------------------|---------------------------------------|
+| Variable Name           | Type                         | Description                                   |
+|--------------------------|------------------------------|-----------------------------------------------|
 | `cmd_vel`               | `geometry_msgs::msg::Twist` | Velocity and angular velocity commands for the robot |
 
 ### Internal Values
 
-| Variable Name      | Type            | Description                         |
-|-------------------------|-------------------|---------------------------------------|
-| `x`, `y`, `yaw`         | `double`          | Current position and orientation of the robot |
-| `v`, `w`                | `double`          | Velocity and angular velocity of the robot |
-| `cx`, `cy`,`cyaw`, `ck` | `std::vector<double>` | List of x and y coordinates of the path |
-| `target_ind`            | `int`             | Current target index |
-| `target_vel`            | `double`          | Target velocity |
-| `goal_threshold`        | `double`          | Threshold for goal judgment |
-| `k`, `Lfc`, `Kp`, `dt`  | `double`          | Pure Pursuit parameters |
-| `oldNearestPointIndex`  | `int`             | Index of the nearest point in the previous iteration |
-| `current_vel`           | `double`          | Current velocity of the robot |
-| `minCurvature`,`maxCurvature`         | `double`          | Minimum and maximum curvature values |
-| `minVelocity`,`maxVelocity`           | `double`          | Minimum and maximum velocity values |
+| Variable Name           | Type                                    | Description                                   |
+|--------------------------|-----------------------------------------|-----------------------------------------------|
+| `x_`                    | `std::array<double, 5>`                | Current state of the robot: [x, y, yaw, v, w] |
+| `goal_`                 | `std::array<double, 2>`                | Target goal position: [goal_x, goal_y]        |
+| `obstacle_`             | `std::vector<std::array<double, 2>>`   | List of local obstacle positions: [x, y]      |
+| `kinematic_`            | `std::array<double, 6>`                | Robot kinematic parameters                    |
+| `eval_param_`           | `std::array<double, 4>`                | Parameters for evaluation functions           |
+| `robot_radius_`         | `double`                               | Radius of the robot                           |
+| `obstacle_radius_`      | `double`                               | Radius of obstacles                           |
+| `received_odom_`        | `bool`                                 | Flag indicating whether odometry data is received |
+| `received_obstacles_`   | `bool`                                 | Flag indicating whether obstacle data is received |
+| `received_goal_`        | `bool`                                 | Flag indicating whether goal data is received |
+| `timer_`                | `rclcpp::TimerBase::SharedPtr`         | Timer for periodic callbacks                  |
+| `static_broadcaster_`   | `std::shared_ptr<tf2_ros::StaticTransformBroadcaster>` | Broadcaster for static transforms |
+| `DT`                    | `const double`                         | Time step for computations                    |
+| `DWA`                   | `class`                                | DWA computation instance                      |
 
 ## Software architecture
 
