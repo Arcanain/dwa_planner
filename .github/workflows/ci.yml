@@ -14,7 +14,7 @@ on:
 
 jobs:
   build-and-test:
-    container: osrf/ros:humble-ros-base
+    container: ros:humble-ros-base
     runs-on: ubuntu-22.04
 
     steps:
