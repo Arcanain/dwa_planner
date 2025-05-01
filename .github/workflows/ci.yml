@@ -26,6 +26,11 @@ jobs:
         with:
           required-ros-distributions: ${{ env.ROS_DISTRO }}
 
+      - name: Remove ROS 1 apt source (noble)
+        run: |
+          sudo rm -f /etc/apt/sources.list.d/ros-latest.list
+          sudo apt-get update
+        
       - name: Install dependencies
         run: |
           sudo apt-get update
