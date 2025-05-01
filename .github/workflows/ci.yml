@@ -19,18 +19,23 @@ jobs:
       ROS_DISTRO: humble
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up ROS 2 Humble
         uses: ros-tooling/setup-ros@v0.1
         with:
-          version: ${{ env.ROS_DISTRO }}
+          required-ros-distributions: ${{ env.ROS_DISTRO }}
 
       - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y python3-colcon-common-extensions lcov
+
+      - name: Install ROS package dependencies
+        run: |
+          source /opt/ros/${ROS_DISTRO}/setup.bash
+          rosdep update
+          rosdep install --from-paths src --ignore-src -r -y
 
       - name: Install ROS package dependencies
         run: |
