@@ -34,7 +34,7 @@ jobs:
       - name: Install ROS package dependencies
         run: |
           source /opt/ros/humble/setup.bash
-          rosdep install --from-paths src --ignore-src --rosdistro humble -r -y
+          rosdep install --from-path . -i -y --rosdistro humble
 
       - name: Build
         run: |
