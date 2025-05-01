@@ -76,6 +76,21 @@ genhtml coverage.filtered.info --output-directory coverage_html --branch-coverag
 xdg-open coverage_html/index.html
 ```
 
+## csv test
+```
+colcon test \
+  --packages-select dwa_planner \
+  --event-handlers console_direct+ \
+  --ctest-args -R test_dwa_csv
+
+colcon test-result --verbose
+```
+
+```
+# ワークスペース直下で
+find build/dwa_planner -type f -name test_results.csv
+```
+
 ## Interface Table
 
 ### Input
