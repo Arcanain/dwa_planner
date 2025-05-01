@@ -52,38 +52,6 @@ target_link_libraries(dwa_planner PRIVATE dwa_planner_library)
 #==========================================================
 # テストターゲットの定義
 #==========================================================
-# if(BUILD_TESTING)
-#   # Unit Test: test_dwa_component
-#   ament_add_gtest(test_dwa_component
-#     test/test_dwa_component.cpp
-#   )
-#   if(TARGET test_dwa_component)
-#     # ライブラリをリンク（キーワードを削除）
-#     target_link_libraries(test_dwa_component dwa_planner_library)
-
-#     # includeディレクトリを指定
-#     target_include_directories(test_dwa_component PUBLIC
-#       ${CMAKE_CURRENT_SOURCE_DIR}/include
-#     )
-
-#     # 必要な依存関係を追加
-#     ament_target_dependencies(test_dwa_component
-#       rclcpp geometry_msgs nav_msgs tf2_ros tf2_geometry_msgs
-#     )
-#   endif()
-
-#   # カバレッジ生成ターゲットの追加
-#   find_program(LCOV_EXEC lcov)
-#   find_program(GENHTML_EXEC genhtml)
-#   if(LCOV_EXEC AND GENHTML_EXEC)
-#     add_custom_target(coverage
-#       COMMAND ${LCOV_EXEC} --directory . --capture --output-file coverage.info
-#       COMMAND ${GENHTML_EXEC} coverage.info --output-directory coverage_html
-#       COMMENT "Generating coverage report..."
-#     )
-#   endif()
-# endif()
-
 if(BUILD_TESTING)
   ament_add_gtest(test_dwa_component
     test/test_dwa_component.cpp
@@ -130,6 +98,37 @@ if(BUILD_TESTING)
         ${CMAKE_CURRENT_SOURCE_DIR}/test/test_data.csv
         $<TARGET_FILE_DIR:test_dwa_csv>/test_data.csv
       ) 
+  endif()
+
+  # ── CSV ベースの全関数対応 CSV テストを追加 ───────────────────
+  ament_add_gtest(test_dwa_all_functions
+    test/test_all_functions_csv.cpp
+  )
+  if (TARGET test_dwa_all_functions)
+    target_link_libraries(test_dwa_all_functions dwa_planner_library)
+    target_include_directories(test_dwa_all_functions PUBLIC
+      ${CMAKE_CURRENT_SOURCE_DIR}/include
+      ${CMAKE_CURRENT_SOURCE_DIR}/test
+    )
+    ament_target_dependencies(test_dwa_all_functions
+      rclcpp geometry_msgs nav_msgs tf2_ros tf2_geometry_msgs
+    )
+
+    # # テスト用 CSV データをコピー
+    # add_custom_command(TARGET test_dwa_all_functions POST_BUILD
+    #   COMMAND ${CMAKE_COMMAND} -E copy_directory
+    #     ${CMAKE_CURRENT_SOURCE_DIR}/test/test_data
+    #     ${CMAKE_CURRENT_BINARY_DIR}/test_data
+    # )
+    # # 実行時カレントディレクトリをバイナリルートに設定
+    # set_tests_properties(test_dwa_all_functions PROPERTIES
+    #   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+    #   #WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/test/test_data"
+    # )
+
+    set_tests_properties(test_dwa_all_functions PROPERTIES
+      WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/test/test_data"
+    )
   endif()
 
   # カバレッジ生成ターゲットの追加

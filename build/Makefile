@@ -250,6 +250,19 @@ test_dwa_csv/fast:
 .PHONY : test_dwa_csv/fast
 
 #=============================================================================
+# Target rules for targets named test_dwa_all_functions
+
+# Build rule for target.
+test_dwa_all_functions: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_dwa_all_functions
+.PHONY : test_dwa_all_functions
+
+# fast build rule for target.
+test_dwa_all_functions/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_dwa_all_functions.dir/build.make CMakeFiles/test_dwa_all_functions.dir/build
+.PHONY : test_dwa_all_functions/fast
+
+#=============================================================================
 # Target rules for targets named coverage
 
 # Build rule for target.
@@ -360,6 +373,30 @@ src/dwa_planner_node.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/dwa_planner_library.dir/build.make CMakeFiles/dwa_planner_library.dir/src/dwa_planner_node.cpp.s
 .PHONY : src/dwa_planner_node.cpp.s
 
+test/test_all_functions_csv.o: test/test_all_functions_csv.cpp.o
+.PHONY : test/test_all_functions_csv.o
+
+# target to build an object file
+test/test_all_functions_csv.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_dwa_all_functions.dir/build.make CMakeFiles/test_dwa_all_functions.dir/test/test_all_functions_csv.cpp.o
+.PHONY : test/test_all_functions_csv.cpp.o
+
+test/test_all_functions_csv.i: test/test_all_functions_csv.cpp.i
+.PHONY : test/test_all_functions_csv.i
+
+# target to preprocess a source file
+test/test_all_functions_csv.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_dwa_all_functions.dir/build.make CMakeFiles/test_dwa_all_functions.dir/test/test_all_functions_csv.cpp.i
+.PHONY : test/test_all_functions_csv.cpp.i
+
+test/test_all_functions_csv.s: test/test_all_functions_csv.cpp.s
+.PHONY : test/test_all_functions_csv.s
+
+# target to generate assembly for a file
+test/test_all_functions_csv.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_dwa_all_functions.dir/build.make CMakeFiles/test_dwa_all_functions.dir/test/test_all_functions_csv.cpp.s
+.PHONY : test/test_all_functions_csv.cpp.s
+
 test/test_dwa_component.o: test/test_dwa_component.cpp.o
 .PHONY : test/test_dwa_component.o
 
@@ -428,6 +465,7 @@ help:
 	@echo "... dwa_planner_library"
 	@echo "... gtest"
 	@echo "... gtest_main"
+	@echo "... test_dwa_all_functions"
 	@echo "... test_dwa_component"
 	@echo "... test_dwa_csv"
 	@echo "... src/dwa_planner.o"
@@ -439,6 +477,9 @@ help:
 	@echo "... src/dwa_planner_node.o"
 	@echo "... src/dwa_planner_node.i"
 	@echo "... src/dwa_planner_node.s"
+	@echo "... test/test_all_functions_csv.o"
+	@echo "... test/test_all_functions_csv.i"
+	@echo "... test/test_all_functions_csv.s"
 	@echo "... test/test_dwa_component.o"
 	@echo "... test/test_dwa_component.i"
 	@echo "... test/test_dwa_component.s"
