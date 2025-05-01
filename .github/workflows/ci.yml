@@ -56,3 +56,23 @@ jobs:
             --packages-select dwa_planner \
             --event-handlers console_direct+ \
             --ctest-args -R test_dwa_all_functions
+
+      - name: Generate coverage report
+        if: success()
+        run: |
+          cd build/dwa_planner
+          make coverage
+
+      - name: Upload coverage HTML
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: build/dwa_planner/coverage_html
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results-xml
+          path: build/dwa_planner/test_results
