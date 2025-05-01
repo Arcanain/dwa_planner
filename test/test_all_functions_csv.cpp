@@ -1,54 +1,10 @@
 #include <gtest/gtest.h>
-#include "dwa_planner/dwa_planner_component.hpp"
-
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <vector>
-#include <map>
-#include <functional>
-#include <cmath>
-#include <stdexcept>
+#include "test_utils.hpp"                       // test utility（必ずインクルード）
+#include "dwa_planner/dwa_planner_component.hpp"    // テスト対象
 
 using namespace dwa_planner;
-
-// --- CSV 読み込みユーティリティ --------------------------------
-static std::vector<std::map<std::string, double>> readCsv(const std::string & path) {
-  std::ifstream ifs(path);
-  if (!ifs) throw std::runtime_error("Cannot open CSV: " + path);
-  std::string line;
-  std::vector<std::string> headers;
-  // ヘッダ行
-  if (std::getline(ifs, line)) {
-    std::stringstream ss(line);
-    std::string col;
-    while (std::getline(ss, col, ',')) {
-      headers.push_back(col);
-    }
-  }
-  // データ行
-  std::vector<std::map<std::string,double>> rows;
-  while (std::getline(ifs, line)) {
-    std::stringstream ss(line);
-    std::string cell;
-    std::map<std::string,double> row;
-    for (size_t i = 0; i < headers.size() && std::getline(ss, cell, ','); ++i) {
-      row[headers[i]] = std::stod(cell);
-    }
-    rows.push_back(row);
-  }
-  return rows;
-}
-// ----------------------------------------------------------------
-
-// テスト対象関数を抽象化するための構造体
-struct FuncTest {
-  std::string name;
-  std::vector<std::string> inCols;   // 入力カラム名
-  std::vector<std::string> outCols;  // 期待値カラム名
-  // CSV の１行 map<string,double> → 関数呼び出し → vector<double>（実際の戻り値）
-  std::function<std::vector<double>(const std::map<std::string,double>&)> invoke;
-};
+using test_utils::FuncTest;
+using test_utils::runCsvTests;
 
 TEST(DWA_AllFunctions, CsvBased) {
   const double tol = 1e-3;
@@ -163,44 +119,6 @@ TEST(DWA_AllFunctions, CsvBased) {
     }
   };
 
-  // 各関数ごとにテスト実行
-  for (auto &ft : tests) {
-    // 1) 入力 CSV 読み込み
-    // auto rows = readCsv("test_data/" + ft.name + ".csv");
-    auto rows = readCsv(ft.name + ".csv");
-
-    // 2) 結果出力用 CSV
-    std::ofstream ofs("test_results_" + ft.name + ".csv");
-    // ヘッダ
-    for (size_t k = 0; k < ft.outCols.size(); ++k) {
-      ofs << ft.outCols[k]          // 期待値カラム名
-          << ",act_" << ft.outCols[k]; // 実際値カラム名
-      if (k + 1 < ft.outCols.size()) ofs << ",";
-    }
-    ofs << ",OK\n";
-
-    // 3) 各行チェック
-    for (size_t i = 0; i < rows.size(); ++i) {
-      const auto &r = rows[i];
-      auto result = ft.invoke(r);
-
-      bool ok = true;
-      for (size_t k = 0; k < ft.outCols.size(); ++k) {
-        double expv = r.at(ft.outCols[k]);
-        if (std::fabs(result[k] - expv) > tol) ok = false;
-      }
-
-      // CSV 書き出し：期待値, 実際値, OK/NG
-      for (size_t k = 0; k < ft.outCols.size(); ++k) {
-        ofs << r.at(ft.outCols[k])     // 期待値
-            << "," << result[k];       // 実際の出力
-        if (k + 1 < ft.outCols.size()) ofs << ",";
-      }
-      ofs << "," << (ok ? "OK" : "NG") << "\n";
-
-      // GTest レポート
-      EXPECT_TRUE(ok) << "[" << ft.name << "] row " << i;
-    }
-    ofs.close();
-  }
+  // 共通ランナーを呼び出すだけ
+  runCsvTests(tests, tol);
 }
