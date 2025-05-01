@@ -38,26 +38,20 @@ jobs:
 
       - name: Install ROS package dependencies
         run: |
-          source /opt/ros/${ROS_DISTRO}/setup.bash
-          rosdep update
-          rosdep install --from-paths src --ignore-src -r -y
-
-      - name: Install ROS package dependencies
-        run: |
-          source /opt/ros/${ROS_DISTRO}/setup.bash
+          source /opt/ros/humble/setup.bash
           rosdep update
           rosdep install --from-paths src --ignore-src -r -y
 
       - name: Build
         run: |
-          source /opt/ros/${ROS_DISTRO}/setup.bash
+          source /opt/ros/humble/setup.bash
           colcon build \
             --packages-select dwa_planner \
             --cmake-args -DCMAKE_CXX_FLAGS="--coverage"
 
       - name: Run tests
         run: |
-          source install/setup.bash
+          source /opt/ros/humble/setup.bash
           colcon test \
             --packages-select dwa_planner \
             --event-handlers console_direct+ \
