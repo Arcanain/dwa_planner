@@ -3,6 +3,7 @@
 /home/ramune/ros2_ws/src/dwa_planner/build/CMakeFiles/dwa_planner_library.dir
 /home/ramune/ros2_ws/src/dwa_planner/build/CMakeFiles/dwa_planner.dir
 /home/ramune/ros2_ws/src/dwa_planner/build/CMakeFiles/test_dwa_component.dir
+/home/ramune/ros2_ws/src/dwa_planner/build/CMakeFiles/test_dwa_csv.dir
 /home/ramune/ros2_ws/src/dwa_planner/build/CMakeFiles/coverage.dir
 /home/ramune/ros2_ws/src/dwa_planner/build/CMakeFiles/test.dir
 /home/ramune/ros2_ws/src/dwa_planner/build/CMakeFiles/edit_cache.dir
