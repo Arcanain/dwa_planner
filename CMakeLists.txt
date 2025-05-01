@@ -129,6 +129,12 @@ install(DIRECTORY include/
   DESTINATION include/
 )
 
+# YAML 設定ファイルをインストール
+install(
+  DIRECTORY config/
+  DESTINATION share/${PROJECT_NAME}/config
+)
+
 # その他のファイルのインストール
 install(DIRECTORY
   launch

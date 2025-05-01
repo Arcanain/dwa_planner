@@ -22,9 +22,34 @@ DWAPlannerNode::DWAPlannerNode()
   received_odom_(false)
 {
   // デフォルトパラメータ
-//   kinematic_ = {1.0, toRadian(20.0), 0.2, toRadian(50.0), 0.01, toRadian(1.0)};
-  kinematic_ = {0.5, toRadian(20.0), 0.1, toRadian(50.0), 0.01, toRadian(1.0)};
-  eval_param_ = {0.1, 0.08, 0.1, 3.0};
+//   kinematic_ = {1.0, TO_RADIAN(20.0), 0.2, TO_RADIAN(50.0), 0.01, TO_RADIAN(1.0)};
+  // kinematic_ = {0.5, TO_RADIAN(20.0), 0.1, TO_RADIAN(50.0), 0.01, TO_RADIAN(1.0)};
+  // eval_param_ = {0.1, 0.08, 0.1, 3.0};
+
+  // デフォルト値を宣言
+  this->declare_parameter<std::vector<double>>("kinematic", {0.5, 20.0, 0.1, 50.0, 0.01, 1.0});
+  this->declare_parameter<std::vector<double>>("eval_param", {0.1, 0.08, 0.1, 3.0});
+  this->declare_parameter<double>("robot_radius", 0.3);
+  this->declare_parameter<double>("obstacle_radius", 0.3);
+
+  // YAML から取得
+  std::vector<double> kin_vec, eval_vec;
+  this->get_parameter("kinematic", kin_vec);
+  this->get_parameter("eval_param", eval_vec);
+  this->get_parameter("robot_radius", robot_radius_);
+  this->get_parameter("obstacle_radius", obstacle_radius_);
+
+  // 配列に詰め替え（角度はマクロで変換）
+  kinematic_[0] = kin_vec[0];
+  kinematic_[1] = TO_RADIAN(kin_vec[1]);
+  kinematic_[2] = kin_vec[2];
+  kinematic_[3] = TO_RADIAN(kin_vec[3]);
+  kinematic_[4] = kin_vec[4];
+  kinematic_[5] = TO_RADIAN(kin_vec[5]);
+
+  for (size_t i = 0; i < eval_param_.size(); ++i) {
+    eval_param_[i] = eval_vec[i];
+  }
 
   // Subscriber
   odom_sub_ = create_subscription<nav_msgs::msg::Odometry>(

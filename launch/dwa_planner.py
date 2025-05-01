@@ -49,6 +49,7 @@ def generate_launch_description():
         package=package_name,
         executable='dwa_planner',
         output="screen",
+        parameters=['config/params.yaml'],
     )
 
     odometry_pub_node = Node(
