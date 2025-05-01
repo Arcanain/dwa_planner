@@ -87,6 +87,15 @@ colcon test-result --verbose
 ```
 
 ```
+colcon build --packages-select dwa_planner --cmake-args -DCMAKE_CXX_FLAGS="--coverage"
+
+colcon test \
+  --packages-select dwa_planner \
+  --event-handlers console_direct+ \
+  --ctest-args -R test_dwa_all_functions
+```
+
+```
 # ワークスペース直下で
 find build/dwa_planner -type f -name test_results.csv
 ```
