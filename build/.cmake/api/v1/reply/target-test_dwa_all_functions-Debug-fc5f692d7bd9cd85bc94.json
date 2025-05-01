@@ -2,7 +2,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "test_dwa_csv"
+			"path" : "test_dwa_all_functions"
 		}
 	],
 	"backtrace" : 4,
@@ -34,7 +34,7 @@
 			{
 				"command" : 3,
 				"file" : 2,
-				"line" : 107,
+				"line" : 104,
 				"parent" : 0
 			},
 			{
@@ -70,13 +70,13 @@
 			{
 				"command" : 4,
 				"file" : 2,
-				"line" : 112,
+				"line" : 108,
 				"parent" : 0
 			},
 			{
 				"command" : 5,
 				"file" : 2,
-				"line" : 123,
+				"line" : 113,
 				"parent" : 0
 			},
 			{
@@ -94,7 +94,7 @@
 			{
 				"command" : 7,
 				"file" : 2,
-				"line" : 117,
+				"line" : 109,
 				"parent" : 0
 			},
 			{
@@ -381,7 +381,7 @@
 			"id" : "gtest_main::@0af4add9fe94340e763e"
 		}
 	],
-	"id" : "test_dwa_csv::@6890427a1f51a3e7e1df",
+	"id" : "test_dwa_all_functions::@6890427a1f51a3e7e1df",
 	"link" : 
 	{
 		"commandFragments" : 
@@ -943,8 +943,8 @@
 		],
 		"language" : "CXX"
 	},
-	"name" : "test_dwa_csv",
-	"nameOnDisk" : "test_dwa_csv",
+	"name" : "test_dwa_all_functions",
+	"nameOnDisk" : "test_dwa_all_functions",
 	"paths" : 
 	{
 		"build" : ".",
@@ -965,7 +965,7 @@
 		{
 			"backtrace" : 4,
 			"compileGroupIndex" : 0,
-			"path" : "test/test_dwa_planner_csv.cpp",
+			"path" : "test/test_all_functions_csv.cpp",
 			"sourceGroupIndex" : 0
 		}
 	],
