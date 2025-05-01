@@ -237,6 +237,19 @@ test_dwa_component/fast:
 .PHONY : test_dwa_component/fast
 
 #=============================================================================
+# Target rules for targets named test_dwa_csv
+
+# Build rule for target.
+test_dwa_csv: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_dwa_csv
+.PHONY : test_dwa_csv
+
+# fast build rule for target.
+test_dwa_csv/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_dwa_csv.dir/build.make CMakeFiles/test_dwa_csv.dir/build
+.PHONY : test_dwa_csv/fast
+
+#=============================================================================
 # Target rules for targets named coverage
 
 # Build rule for target.
@@ -371,6 +384,30 @@ test/test_dwa_component.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_dwa_component.dir/build.make CMakeFiles/test_dwa_component.dir/test/test_dwa_component.cpp.s
 .PHONY : test/test_dwa_component.cpp.s
 
+test/test_dwa_planner_csv.o: test/test_dwa_planner_csv.cpp.o
+.PHONY : test/test_dwa_planner_csv.o
+
+# target to build an object file
+test/test_dwa_planner_csv.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_dwa_csv.dir/build.make CMakeFiles/test_dwa_csv.dir/test/test_dwa_planner_csv.cpp.o
+.PHONY : test/test_dwa_planner_csv.cpp.o
+
+test/test_dwa_planner_csv.i: test/test_dwa_planner_csv.cpp.i
+.PHONY : test/test_dwa_planner_csv.i
+
+# target to preprocess a source file
+test/test_dwa_planner_csv.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_dwa_csv.dir/build.make CMakeFiles/test_dwa_csv.dir/test/test_dwa_planner_csv.cpp.i
+.PHONY : test/test_dwa_planner_csv.cpp.i
+
+test/test_dwa_planner_csv.s: test/test_dwa_planner_csv.cpp.s
+.PHONY : test/test_dwa_planner_csv.s
+
+# target to generate assembly for a file
+test/test_dwa_planner_csv.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_dwa_csv.dir/build.make CMakeFiles/test_dwa_csv.dir/test/test_dwa_planner_csv.cpp.s
+.PHONY : test/test_dwa_planner_csv.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -392,6 +429,7 @@ help:
 	@echo "... gtest"
 	@echo "... gtest_main"
 	@echo "... test_dwa_component"
+	@echo "... test_dwa_csv"
 	@echo "... src/dwa_planner.o"
 	@echo "... src/dwa_planner.i"
 	@echo "... src/dwa_planner.s"
@@ -404,6 +442,9 @@ help:
 	@echo "... test/test_dwa_component.o"
 	@echo "... test/test_dwa_component.i"
 	@echo "... test/test_dwa_component.s"
+	@echo "... test/test_dwa_planner_csv.o"
+	@echo "... test/test_dwa_planner_csv.i"
+	@echo "... test/test_dwa_planner_csv.s"
 .PHONY : help
 
 

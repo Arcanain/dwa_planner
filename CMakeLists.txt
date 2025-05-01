@@ -101,6 +101,37 @@ if(BUILD_TESTING)
     )
   endif()
 
+  # ── CSV ベースのテストターゲットを追加 ───────────────────
+  # 1) テストユーティリティヘッダを 'test/test_csv_utils.hpp' に置くこと
+  # 2) テストコードを 'test/test_dwa_planner_csv.cpp' として作成すること
+  ament_add_gtest(test_dwa_csv
+    test/test_dwa_planner_csv.cpp
+  )
+  if(TARGET test_dwa_csv)
+    # ライブラリ本体をリンク
+    target_link_libraries(test_dwa_csv dwa_planner_library)
+    #target_compile_options(test_dwa_csv PUBLIC -fprofile-arcs -ftest-coverage)
+    #target_link_options(test_dwa_csv PUBLIC -fprofile-arcs -ftest-coverage)
+
+    # include パスに <project_root>/include と <project_root>/test を追加
+    target_include_directories(test_dwa_csv PUBLIC
+      ${CMAKE_CURRENT_SOURCE_DIR}/include
+      ${CMAKE_CURRENT_SOURCE_DIR}/test
+    )
+  
+    # 依存パッケージを追加
+    ament_target_dependencies(test_dwa_csv
+      rclcpp geometry_msgs nav_msgs tf2_ros tf2_geometry_msgs
+    )
+
+    # ビルド後、自動で CSV ファイルをテスト実行ディレクトリにコピー
+    add_custom_command(TARGET test_dwa_csv POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_CURRENT_SOURCE_DIR}/test/test_data.csv
+        $<TARGET_FILE_DIR:test_dwa_csv>/test_data.csv
+      ) 
+  endif()
+
   # カバレッジ生成ターゲットの追加
   find_program(LCOV_EXEC lcov)
   find_program(GENHTML_EXEC genhtml)

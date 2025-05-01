@@ -46,7 +46,6 @@ public:
     double robotR
   );
 
-private:
   // Dynamic Windowの計算
   static std::array<double, 4> CalcDynamicWindow(
     const std::array<double, 5> & x,

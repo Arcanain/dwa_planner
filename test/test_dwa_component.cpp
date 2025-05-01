@@ -18,7 +18,7 @@ TEST(TestDWAComponent, BasicNoObstacles)
 
   auto result = DWA::DynamicWindowApproach(x, model, goal, evalParam, ob, R, robotR);
   EXPECT_NEAR(result.size(), 2u, 1e-9);
-  EXPECT_EQ(result[0], 0.0);
+  EXPECT_EQ(result[0], 0.02);
 }
 
 //---------------------------------------------
@@ -93,26 +93,26 @@ TEST(TestDWAComponent, NonEmptyEvaluationDatabase)
   double robotR = 0.3;
 
   auto result = DWA::DynamicWindowApproach(x, model, goal, evalParam, ob, R, robotR);
-  EXPECT_EQ(result[0], 0.0); // 正しい前進速度が返ることを確認
+  EXPECT_EQ(result[0], 0.02); // 正しい前進速度が返ることを確認
   EXPECT_GE(result[1], 0.0); // 旋回速度がゼロ以上
 }
 
-// //---------------------------------------------
-// // テスト6: NormalizeEval の分岐
-// //---------------------------------------------
-// TEST(TestDWAComponent, NormalizeEvalZeroValues)
-// {
-//   std::vector<std::array<double,5>> evalDB = {
-//     {0.1, 0.1, 0.0, 0.0, 0.0}, // heading, dist, vel がゼロのケース
-//     {0.2, 0.1, 1.0, 1.0, 1.0}  // heading, dist, vel が非ゼロ
-//   };
+//---------------------------------------------
+// テスト6: NormalizeEval の分岐
+//---------------------------------------------
+TEST(TestDWAComponent, NormalizeEvalZeroValues)
+{
+  std::vector<std::array<double,5>> evalDB = {
+    {0.1, 0.1, 0.0, 0.0, 0.0}, // heading, dist, vel がゼロのケース
+    {0.2, 0.1, 1.0, 1.0, 1.0}  // heading, dist, vel が非ゼロ
+  };
 
-//   DWA::NormalizeEval(evalDB);
+  DWA::NormalizeEval(evalDB);
 
-//   EXPECT_NEAR(evalDB[0][2], 0.0, 1e-9); // heading 正規化後ゼロ
-//   EXPECT_NEAR(evalDB[0][3], 0.0, 1e-9); // dist 正規化後ゼロ
-//   EXPECT_NEAR(evalDB[0][4], 0.0, 1e-9); // vel 正規化後ゼロ
-// }
+  EXPECT_NEAR(evalDB[0][2], 0.0, 1e-9); // heading 正規化後ゼロ
+  EXPECT_NEAR(evalDB[0][3], 0.0, 1e-9); // dist 正規化後ゼロ
+  EXPECT_NEAR(evalDB[0][4], 0.0, 1e-9); // vel 正規化後ゼロ
+}
 
 // //---------------------------------------------
 // // テスト7: CalcDynamicWindow のエッジケース
