@@ -65,8 +65,6 @@ CMAKE_BINARY_DIR = /home/ramune/ros2_ws/src/dwa_planner/build
 # The main recursive "all" target.
 all: CMakeFiles/dwa_planner_library.dir/all
 all: CMakeFiles/dwa_planner.dir/all
-all: CMakeFiles/test_dwa_component.dir/all
-all: CMakeFiles/test_dwa_csv.dir/all
 all: CMakeFiles/test_dwa_all_functions.dir/all
 all: gtest/all
 .PHONY : all
@@ -80,8 +78,6 @@ clean: CMakeFiles/uninstall.dir/clean
 clean: CMakeFiles/dwa_planner_uninstall.dir/clean
 clean: CMakeFiles/dwa_planner_library.dir/clean
 clean: CMakeFiles/dwa_planner.dir/clean
-clean: CMakeFiles/test_dwa_component.dir/clean
-clean: CMakeFiles/test_dwa_csv.dir/clean
 clean: CMakeFiles/test_dwa_all_functions.dir/clean
 clean: CMakeFiles/coverage.dir/clean
 clean: gtest/clean
@@ -206,62 +202,6 @@ dwa_planner: CMakeFiles/dwa_planner.dir/rule
 CMakeFiles/dwa_planner.dir/clean:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/dwa_planner.dir/build.make CMakeFiles/dwa_planner.dir/clean
 .PHONY : CMakeFiles/dwa_planner.dir/clean
-
-#=============================================================================
-# Target rules for target CMakeFiles/test_dwa_component.dir
-
-# All Build rule for target.
-CMakeFiles/test_dwa_component.dir/all: CMakeFiles/dwa_planner_library.dir/all
-CMakeFiles/test_dwa_component.dir/all: gtest/CMakeFiles/gtest.dir/all
-CMakeFiles/test_dwa_component.dir/all: gtest/CMakeFiles/gtest_main.dir/all
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_dwa_component.dir/build.make CMakeFiles/test_dwa_component.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_dwa_component.dir/build.make CMakeFiles/test_dwa_component.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/ramune/ros2_ws/src/dwa_planner/build/CMakeFiles --progress-num=13,14 "Built target test_dwa_component"
-.PHONY : CMakeFiles/test_dwa_component.dir/all
-
-# Build rule for subdir invocation for target.
-CMakeFiles/test_dwa_component.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/ramune/ros2_ws/src/dwa_planner/build/CMakeFiles 9
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/test_dwa_component.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/ramune/ros2_ws/src/dwa_planner/build/CMakeFiles 0
-.PHONY : CMakeFiles/test_dwa_component.dir/rule
-
-# Convenience name for target.
-test_dwa_component: CMakeFiles/test_dwa_component.dir/rule
-.PHONY : test_dwa_component
-
-# clean rule for target.
-CMakeFiles/test_dwa_component.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_dwa_component.dir/build.make CMakeFiles/test_dwa_component.dir/clean
-.PHONY : CMakeFiles/test_dwa_component.dir/clean
-
-#=============================================================================
-# Target rules for target CMakeFiles/test_dwa_csv.dir
-
-# All Build rule for target.
-CMakeFiles/test_dwa_csv.dir/all: CMakeFiles/dwa_planner_library.dir/all
-CMakeFiles/test_dwa_csv.dir/all: gtest/CMakeFiles/gtest.dir/all
-CMakeFiles/test_dwa_csv.dir/all: gtest/CMakeFiles/gtest_main.dir/all
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_dwa_csv.dir/build.make CMakeFiles/test_dwa_csv.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_dwa_csv.dir/build.make CMakeFiles/test_dwa_csv.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/ramune/ros2_ws/src/dwa_planner/build/CMakeFiles --progress-num=15,16 "Built target test_dwa_csv"
-.PHONY : CMakeFiles/test_dwa_csv.dir/all
-
-# Build rule for subdir invocation for target.
-CMakeFiles/test_dwa_csv.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/ramune/ros2_ws/src/dwa_planner/build/CMakeFiles 9
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/test_dwa_csv.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/ramune/ros2_ws/src/dwa_planner/build/CMakeFiles 0
-.PHONY : CMakeFiles/test_dwa_csv.dir/rule
-
-# Convenience name for target.
-test_dwa_csv: CMakeFiles/test_dwa_csv.dir/rule
-.PHONY : test_dwa_csv
-
-# clean rule for target.
-CMakeFiles/test_dwa_csv.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_dwa_csv.dir/build.make CMakeFiles/test_dwa_csv.dir/clean
-.PHONY : CMakeFiles/test_dwa_csv.dir/clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/test_dwa_all_functions.dir

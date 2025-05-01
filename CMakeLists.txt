@@ -53,52 +53,21 @@ target_link_libraries(dwa_planner PRIVATE dwa_planner_library)
 # テストターゲットの定義
 #==========================================================
 if(BUILD_TESTING)
-  ament_add_gtest(test_dwa_component
-    test/test_dwa_component.cpp
-  )
-  if(TARGET test_dwa_component)
-    target_link_libraries(test_dwa_component dwa_planner_library)
-    target_compile_options(test_dwa_component PUBLIC -fprofile-arcs -ftest-coverage)
-    target_link_options(test_dwa_component PUBLIC -fprofile-arcs -ftest-coverage)
+  # ament_add_gtest(test_dwa_component
+  #   test/test_dwa_component.cpp
+  # )
+  # if(TARGET test_dwa_component)
+  #   target_link_libraries(test_dwa_component dwa_planner_library)
+  #   target_compile_options(test_dwa_component PUBLIC -fprofile-arcs -ftest-coverage)
+  #   target_link_options(test_dwa_component PUBLIC -fprofile-arcs -ftest-coverage)
 
-    target_include_directories(test_dwa_component PUBLIC
-      ${CMAKE_CURRENT_SOURCE_DIR}/include
-    )
-    ament_target_dependencies(test_dwa_component
-      rclcpp geometry_msgs nav_msgs tf2_ros tf2_geometry_msgs
-    )
-  endif()
-
-  # ── CSV ベースのテストターゲットを追加 ───────────────────
-  # 1) テストユーティリティヘッダを 'test/test_csv_utils.hpp' に置くこと
-  # 2) テストコードを 'test/test_dwa_planner_csv.cpp' として作成すること
-  ament_add_gtest(test_dwa_csv
-    test/test_dwa_planner_csv.cpp
-  )
-  if(TARGET test_dwa_csv)
-    # ライブラリ本体をリンク
-    target_link_libraries(test_dwa_csv dwa_planner_library)
-    #target_compile_options(test_dwa_csv PUBLIC -fprofile-arcs -ftest-coverage)
-    #target_link_options(test_dwa_csv PUBLIC -fprofile-arcs -ftest-coverage)
-
-    # include パスに <project_root>/include と <project_root>/test を追加
-    target_include_directories(test_dwa_csv PUBLIC
-      ${CMAKE_CURRENT_SOURCE_DIR}/include
-      ${CMAKE_CURRENT_SOURCE_DIR}/test
-    )
-  
-    # 依存パッケージを追加
-    ament_target_dependencies(test_dwa_csv
-      rclcpp geometry_msgs nav_msgs tf2_ros tf2_geometry_msgs
-    )
-
-    # ビルド後、自動で CSV ファイルをテスト実行ディレクトリにコピー
-    add_custom_command(TARGET test_dwa_csv POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E copy
-        ${CMAKE_CURRENT_SOURCE_DIR}/test/test_data.csv
-        $<TARGET_FILE_DIR:test_dwa_csv>/test_data.csv
-      ) 
-  endif()
+  #   target_include_directories(test_dwa_component PUBLIC
+  #     ${CMAKE_CURRENT_SOURCE_DIR}/include
+  #   )
+  #   ament_target_dependencies(test_dwa_component
+  #     rclcpp geometry_msgs nav_msgs tf2_ros tf2_geometry_msgs
+  #   )
+  # endif()
 
   # ── CSV ベースの全関数対応 CSV テストを追加 ───────────────────
   ament_add_gtest(test_dwa_all_functions
@@ -110,21 +79,10 @@ if(BUILD_TESTING)
       ${CMAKE_CURRENT_SOURCE_DIR}/include
       ${CMAKE_CURRENT_SOURCE_DIR}/test
     )
+
     ament_target_dependencies(test_dwa_all_functions
       rclcpp geometry_msgs nav_msgs tf2_ros tf2_geometry_msgs
     )
-
-    # # テスト用 CSV データをコピー
-    # add_custom_command(TARGET test_dwa_all_functions POST_BUILD
-    #   COMMAND ${CMAKE_COMMAND} -E copy_directory
-    #     ${CMAKE_CURRENT_SOURCE_DIR}/test/test_data
-    #     ${CMAKE_CURRENT_BINARY_DIR}/test_data
-    # )
-    # # 実行時カレントディレクトリをバイナリルートに設定
-    # set_tests_properties(test_dwa_all_functions PROPERTIES
-    #   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-    #   #WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/test/test_data"
-    # )
 
     set_tests_properties(test_dwa_all_functions PROPERTIES
       WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/test/test_data"
@@ -175,18 +133,6 @@ install(DIRECTORY
 #==========================================================
 # Lintやカバレッジ設定 (オプション)
 #==========================================================
-# if(BUILD_TESTING)
-#   find_program(LCOV_EXEC lcov)
-#   find_program(GENHTML_EXEC genhtml)
-#   if(LCOV_EXEC AND GENHTML_EXEC)
-#     add_custom_target(coverage
-#       COMMAND ${LCOV_EXEC} --directory . --capture --output-file coverage.info
-#       COMMAND ${GENHTML_EXEC} coverage.info --output-directory coverage_html
-#       COMMENT "Generating coverage report..."
-#     )
-#   endif()
-# endif()
-
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   set(ament_cmake_cpplint_FOUND TRUE)
