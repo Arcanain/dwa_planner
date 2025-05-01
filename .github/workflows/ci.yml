@@ -41,7 +41,7 @@ jobs:
         run: |
           source /opt/ros/humble/setup.bash
           rosdep update
-          rosdep install --from-paths src --ignore-src -r -y
+          rosdep install --from-paths src --ignore-src --rosdistro humble -r -y
 
       - name: Build
         run: |
