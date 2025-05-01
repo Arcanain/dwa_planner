@@ -1,0 +1,4 @@
+source;share/dwa_planner/local_setup.bash
+source;share/dwa_planner/local_setup.dsv
+source;share/dwa_planner/local_setup.sh
+source;share/dwa_planner/local_setup.zsh

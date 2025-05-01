@@ -72,8 +72,8 @@ double DWA::CalcHeadingEval(
   const std::array<double, 5> & x,
   const std::array<double, 2> & goal)
 {
-  double targetTheta = toDegree(std::atan2(goal[1] - x[1], goal[0] - x[0]));
-  double diff = std::fabs(toDegree(x[2]) - targetTheta);
+  double targetTheta = TO_DEGREE(std::atan2(goal[1] - x[1], goal[0] - x[0]));
+  double diff = std::fabs(TO_DEGREE(x[2]) - targetTheta);
   return 180.0 - std::min(diff, 360.0 - diff);
 }
 
@@ -83,13 +83,16 @@ double DWA::CalcDistEval(
   double R,
   double robotR)
 {
-  double min_dist = std::numeric_limits<double>::infinity();
+  // double min_dist = std::numeric_limits<double>::infinity();
+  double min_dist = 1000;
+
   for (const auto & o : ob) {
     double dist = std::hypot(o[0] - x[0], o[1] - x[1]) - (R + robotR);
     if (dist < min_dist) {
       min_dist = dist;
     }
   }
+
   return min_dist;
 }
 

@@ -11,15 +11,18 @@ namespace dwa_planner
 
 static const double DT = 0.1; // 刻み時間[s]
 
-// ユーティリティ関数（インライン化）
-inline double toRadian(double degree)
-{
-  return degree * M_PI / 180.0;
-}
-inline double toDegree(double radian)
-{
-  return radian * 180.0 / M_PI;
-}
+#define TO_RADIAN(deg) ((deg) * M_PI / 180.0)
+#define TO_DEGREE(rad) ((rad) * 180.0 / M_PI)
+
+// // ユーティリティ関数（インライン化）
+// inline double toRadian(double degree)
+// {
+//   return degree * M_PI / 180.0;
+// }
+// inline double toDegree(double radian)
+// {
+//   return radian * 180.0 / M_PI;
+// }
 
 // DWA計算を行うクラス (静的メソッドのみ)
 class DWA
