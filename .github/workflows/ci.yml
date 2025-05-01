@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - feature/unit_test
+  pull_request:
+    branches:
+      - main
+      - develop
+      - feature/unit_test
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    env:
+      ROS_DISTRO: humble
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up ROS 2 Humble
+        uses: ros-tooling/setup-ros@v0.1
+        with:
+          version: ${{ env.ROS_DISTRO }}
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-colcon-common-extensions lcov
+
+      - name: Install ROS package dependencies
+        run: |
+          source /opt/ros/${ROS_DISTRO}/setup.bash
+          rosdep update
+          rosdep install --from-paths src --ignore-src -r -y
+
+      - name: Build
+        run: |
+          source /opt/ros/${ROS_DISTRO}/setup.bash
+          colcon build \
+            --packages-select dwa_planner \
+            --cmake-args -DCMAKE_CXX_FLAGS="--coverage"
+
+      - name: Run tests
+        run: |
+          source install/setup.bash
+          colcon test \
+            --packages-select dwa_planner \
+            --event-handlers console_direct+ \
+            --ctest-args -R test_dwa_all_functions
