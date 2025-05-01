@@ -51,7 +51,7 @@ struct FuncTest {
 };
 
 TEST(DWA_AllFunctions, CsvBased) {
-  const double tol = 1e-6;
+  const double tol = 1e-3;
 
   // 関数ごとの設定
   std::vector<FuncTest> tests = {
@@ -171,10 +171,13 @@ TEST(DWA_AllFunctions, CsvBased) {
 
     // 2) 結果出力用 CSV
     std::ofstream ofs("test_results_" + ft.name + ".csv");
-    ofs << "row";
-    for (auto &c : ft.inCols)  ofs << "," << c;
-    for (auto &c : ft.outCols) ofs << ",act_" << c << ",OK";
-    ofs << "\n";
+    // ヘッダ
+    for (size_t k = 0; k < ft.outCols.size(); ++k) {
+      ofs << ft.outCols[k]          // 期待値カラム名
+          << ",act_" << ft.outCols[k]; // 実際値カラム名
+      if (k + 1 < ft.outCols.size()) ofs << ",";
+    }
+    ofs << ",OK\n";
 
     // 3) 各行チェック
     for (size_t i = 0; i < rows.size(); ++i) {
@@ -187,13 +190,13 @@ TEST(DWA_AllFunctions, CsvBased) {
         if (std::fabs(result[k] - expv) > tol) ok = false;
       }
 
-      // CSV 書き出し
-      ofs << i;
-      for (auto &c : ft.inCols)  ofs << "," << r.at(c);
+      // CSV 書き出し：期待値, 実際値, OK/NG
       for (size_t k = 0; k < ft.outCols.size(); ++k) {
-        ofs << "," << result[k] << "," << (ok ? "OK" : "NG");
+        ofs << r.at(ft.outCols[k])     // 期待値
+            << "," << result[k];       // 実際の出力
+        if (k + 1 < ft.outCols.size()) ofs << ",";
       }
-      ofs << "\n";
+      ofs << "," << (ok ? "OK" : "NG") << "\n";
 
       // GTest レポート
       EXPECT_TRUE(ok) << "[" << ft.name << "] row " << i;

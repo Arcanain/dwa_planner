@@ -1,3 +1,3 @@
-row,x3,x4,model0,model1,model2,model3,model4,model5,act_exp_min_v,OK,act_exp_max_v,OK,act_exp_min_w,OK,act_exp_max_w,OK
-0,0,0,1,0.35,0.2,0.5,0.01,0.01,0,OK,0.02,OK,-0.05,OK,0.05,OK
-1,0.5,0.1,1,0.35,0.2,0.5,0.01,0.01,0.48,OK,0.52,OK,0.05,OK,0.15,OK
+exp_min_v,act_exp_min_v,exp_max_v,act_exp_max_v,exp_min_w,act_exp_min_w,exp_max_w,act_exp_max_w,OK
+0,0,0.02,0.02,-0.05,-0.05,0.05,0.05,OK
+0.48,0.48,0.52,0.52,0.05,0.05,0.15,0.15,OK

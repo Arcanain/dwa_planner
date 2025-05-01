@@ -1,4 +1,4 @@
-row,x0,x1,x2,goal0,goal1,act_exp_heading,OK
-0,0,0,0,1,0,180,OK
-1,0,0,1.5708,0,1,180,NG
-2,0,0,0,0,1,90,OK
+exp_heading,act_exp_heading,OK
+180,180,OK
+180,180,OK
+90,90,OK
