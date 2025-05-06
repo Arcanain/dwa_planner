@@ -15,17 +15,10 @@ DWAPlannerNode::DWAPlannerNode()
 : Node("dwa_planner"),
   x_{0.0, 0.0, 0.0, 0.0, 0.0},
   goal_{0.0, 0.0},
-  robot_radius_(0.3),
-  obstacle_radius_(0.3),
   received_obstacles_(false),
   received_goal_(false),
   received_odom_(false)
 {
-  // デフォルトパラメータ
-//   kinematic_ = {1.0, TO_RADIAN(20.0), 0.2, TO_RADIAN(50.0), 0.01, TO_RADIAN(1.0)};
-  // kinematic_ = {0.5, TO_RADIAN(20.0), 0.1, TO_RADIAN(50.0), 0.01, TO_RADIAN(1.0)};
-  // eval_param_ = {0.1, 0.08, 0.1, 3.0};
-
   // デフォルト値を宣言
   this->declare_parameter<std::vector<double>>("kinematic", {0.5, 20.0, 0.1, 50.0, 0.01, 1.0});
   this->declare_parameter<std::vector<double>>("eval_param", {0.1, 0.08, 0.1, 3.0});
