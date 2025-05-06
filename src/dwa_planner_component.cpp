@@ -26,7 +26,6 @@ std::vector<double> DWA::DynamicWindowApproach(
 
       if (dist < 0.0) {
         continue;                // 衝突→skip
-
       }
       evalDB.push_back({vt, ot, heading, dist, vel});
     }
