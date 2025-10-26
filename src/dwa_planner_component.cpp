@@ -1,4 +1,5 @@
 #include "dwa_planner/dwa_planner_component.hpp"
+#include <iostream>
 
 namespace dwa_planner
 {
@@ -27,6 +28,7 @@ std::vector<double> DWA::DynamicWindowApproach(
       if (dist < 0.0) {
         continue;                // 衝突→skip
       }
+      std::cout << "ot: " << ot << std::endl;
       evalDB.push_back({vt, ot, heading, dist, vel});
     }
   }
@@ -48,7 +50,11 @@ std::array<double, 4> DWA::CalcDynamicWindow(
   double v_max = std::min(model[0], x[3] + model[2] * DT);
   double w_min = std::max(-model[1], x[4] - model[3] * DT);
   double w_max = std::min(model[1], x[4] + model[3] * DT);
-
+  std::cout << "Dynamic Window: "
+            << "v_min=" << v_min << ", "
+            << "v_max=" << v_max << ", "
+            << "w_min=" << w_min << ", "
+            << "w_max=" << w_max << std::endl;
   return {v_min, v_max, w_min, w_max};
 }
 
@@ -89,6 +95,7 @@ double DWA::CalcDistEval(
     double dist = std::hypot(o[0] - x[0], o[1] - x[1]) - (R + robotR);
     if (dist < min_dist) {
       min_dist = dist;
+      std::cout << "dist: " << dist << std::endl;
     }
   }
 
@@ -114,18 +121,21 @@ std::vector<double> DWA::SelectBestControl(
   const std::vector<std::array<double, 5>> & evalDB,
   const std::array<double, 4> & evalParam)
 {
-  double max_score = -std::numeric_limits<double>::infinity();
+  double max_score = -100;
   std::vector<double> best_u{0.0, 0.0};
-
+  
   for (auto & e : evalDB) {
+    std::cout << "e: " << e[1] << std::endl;
     double score = evalParam[0] * e[2] +
       evalParam[1] * e[3] +
       evalParam[2] * e[4];
+      std::cout << "score: " << score << std::endl;
     if (score > max_score) {
       max_score = score;
       best_u[0] = e[0];
       best_u[1] = e[1];
     }
+    std::cout << "best_u: " << best_u[1] << std::endl;
   }
   return best_u;
 }

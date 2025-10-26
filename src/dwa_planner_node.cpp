@@ -104,6 +104,7 @@ void DWAPlannerNode::timerCallback()
   geometry_msgs::msg::Twist cmd;
   cmd.linear.x = u[0];
   cmd.angular.z = u[1];
+  RCLCPP_INFO(get_logger(), "cmd_vel: (%.2f, %.2f)", cmd.linear.x, cmd.angular.z);
   cmd_vel_pub_->publish(cmd);
 }
 
