@@ -6,11 +6,14 @@ from launch.substitutions import PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
-
 def generate_launch_description():
     package_name = 'dwa_planner'
     simulator_package = 'arcanain_simulator'
     rviz_file_name = "dwa_planner.rviz"
+
+    dwa_params = PathJoinSubstitution(
+        [FindPackageShare(package_name), 'config', 'params.yaml']
+    )
 
     file_path = os.path.expanduser('~/ros2_ws/src/arcanain_simulator/urdf/mobile_robot.urdf.xml')
 
@@ -50,6 +53,12 @@ def generate_launch_description():
         executable='dwa_planner',
         output="screen",
         parameters=['config/params.yaml'],
+    )
+    dwa_planner_node = Node(
+        package=package_name,
+        executable='dwa_planner',
+        output="screen",
+        parameters=[dwa_params],
     )
 
     odometry_pub_node = Node(
