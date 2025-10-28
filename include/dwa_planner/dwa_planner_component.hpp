@@ -14,6 +14,19 @@ static const double DT = 0.1; // 刻み時間[s]
 #define TO_RADIAN(deg) ((deg) * M_PI / 180.0)
 #define TO_DEGREE(rad) ((rad) * 180.0 / M_PI)
 
+//本読んだ時のように完璧に理解することが大切，，と
+//あとは仮説を立てて，検証すること，小さなことでもその繰り返し
+
+/*
+このファイルにはstaticメソッドのみを持つDWAクラスを定義する
+それはなぜ？？
+
+
+この実装は　　static methodのみですが，それはどうしてですか？他のファイルとの関連を元に，このリポジトリの実装の思想を読み取って答えて
+
+*/
+
+
 // DWA計算を行うクラス (静的メソッドのみ)
 class DWA
 {
@@ -33,8 +46,7 @@ public:
     const std::array<double, 4> & evalParam,
     const std::vector<std::array<double, 2>> & ob,
     double R,
-    double robotR
-  );
+    double robotR );
 
   // Dynamic Windowの計算
   static std::array<double, 4> CalcDynamicWindow(

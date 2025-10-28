@@ -22,6 +22,7 @@ public:
   ~DWAPlannerNode() = default;
 
 private:
+  // privateは，クラスの外からアクセスできない．
   void timerCallback();
   void odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg);
   void local_obstacle_callback(const visualization_msgs::msg::MarkerArray::SharedPtr msg);
