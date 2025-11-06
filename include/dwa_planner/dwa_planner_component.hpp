@@ -14,6 +14,11 @@ static const double DT = 0.1; // 刻み時間[s]
 #define TO_RADIAN(deg) ((deg) * M_PI / 180.0)
 #define TO_DEGREE(rad) ((rad) * 180.0 / M_PI)
 
+struct DWAResult {
+  std::vector<double> control;  // [v, ω]
+  std::vector<std::vector<std::array<double, 5>>> trajectories; // 各軌跡
+};
+
 // DWA計算を行うクラス (静的メソッドのみ)
 class DWA
 {
@@ -26,7 +31,7 @@ public:
   //   ob        : 障害物座標群 ([x, y])
   //   R, robotR : 障害物半径, ロボット半径
   // 戻り値： [v, w]
-  static std::vector<double> DynamicWindowApproach(
+  static DWAResult DynamicWindowApproach(
     const std::array<double, 5> & x,
     const std::array<double, 6> & model,
     const std::array<double, 2> & goal,
@@ -42,7 +47,7 @@ public:
     const std::array<double, 6> & model);
 
   // 軌跡生成
-  static std::array<double, 5> GenerateTrajectory(
+  static std::vector<std::array<double, 5>> GenerateTrajectory(
     const std::array<double, 5> & x,
     double vt, double ot,
     double evaldt);
