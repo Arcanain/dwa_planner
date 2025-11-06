@@ -59,6 +59,8 @@ DWAPlannerNode::DWAPlannerNode()
 
   // Publisher
   cmd_vel_pub_ = create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
+  predict_path_pub = create_publisher<nav_msgs::msg::Path>("predict_path", 50);
+
 
   // Timer
   timer_ = create_wall_timer(
@@ -92,7 +94,7 @@ void DWAPlannerNode::timerCallback()
   }
 
   // DWA計算
-  auto u = DWA::DynamicWindowApproach(
+  auto result = DWA::DynamicWindowApproach(
     x_,
     kinematic_,
     goal_,
@@ -101,11 +103,38 @@ void DWAPlannerNode::timerCallback()
     obstacle_radius_,
     robot_radius_);
 
+  // --- 最適制御コマンドを取得 ---
   geometry_msgs::msg::Twist cmd;
-  cmd.linear.x = u[0];
-  cmd.angular.z = u[1];
+  cmd.linear.x = result.control[0];
+  cmd.angular.z = result.control[1];
   RCLCPP_INFO(get_logger(), "cmd_vel: (%.2f, %.2f)", cmd.linear.x, cmd.angular.z);
   cmd_vel_pub_->publish(cmd);
+
+  // --- 軌跡をパスとして可視化 ---
+  nav_msgs::msg::Path all_traj_path;
+  all_traj_path.header.stamp = now();
+  all_traj_path.header.frame_id = "odom";
+
+  // すべての GenerateTrajectory() 結果を Path に追加
+  for (const auto &xt : result.trajectories) {
+    for (const auto &state : xt) {
+      geometry_msgs::msg::PoseStamped pose;
+      pose.header.stamp = now();
+      pose.header.frame_id = "odom";
+      pose.pose.position.x = state[0];
+      pose.pose.position.y = state[1];
+
+      // θ（yaw）を姿勢に変換
+      tf2::Quaternion q;
+      q.setRPY(0, 0, state[2]);
+      pose.pose.orientation = tf2::toMsg(q);
+
+      all_traj_path.poses.push_back(pose);
+    }
+  }
+
+  // --- 軌跡群を publish ---
+  predict_path_pub->publish(all_traj_path);
 }
 
 void DWAPlannerNode::odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg)

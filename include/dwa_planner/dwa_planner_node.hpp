@@ -11,6 +11,7 @@
 #include "nav_msgs/msg/odometry.hpp"
 #include "visualization_msgs/msg/marker_array.hpp"
 #include "tf2_ros/static_transform_broadcaster.h"
+#include <nav_msgs/msg/path.hpp>
 
 namespace dwa_planner
 {
@@ -36,6 +37,7 @@ private:
 
   // Publisher
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr cmd_vel_pub_;
+  rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr predict_path_pub;
 
   // Timer
   rclcpp::TimerBase::SharedPtr timer_;
