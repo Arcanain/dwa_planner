@@ -4,7 +4,7 @@ dwa_planner:
     kinematic: [1.0, 300.0, 1.0, 150.0, 0.02, 0.5]
 
     # eval_param: [heading_gain, dist_gain, vel_gain, predict_dt]
-    eval_param: [0.6, 0.4, 0.3, 2.0]
+    eval_param: [0.3, 0.6, 0.5, 2.0]
     # 半径
     robot_radius: 0.3
     obstacle_radius: 0.3

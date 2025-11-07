@@ -10,6 +10,13 @@ struct DWAResult {
 namespace dwa_planner
 {
 
+static inline double normalizeAngle(double a) {
+  // normalize to [-pi, pi)
+  while (a > M_PI) a -= 2.0 * M_PI;
+  while (a <= -M_PI) a += 2.0 * M_PI;
+  return a;
+}
+
 DWAResult DWA::DynamicWindowApproach(
   const std::array<double, 5> & x,
   const std::array<double, 6> & model,
@@ -35,7 +42,12 @@ DWAResult DWA::DynamicWindowApproach(
       if (dist < 0.05) {
         continue;                // 衝突→skip
       }
-      std::cout << "ot: " << ot << std::endl;
+      /*std::cout << "score: "
+            << "heading=" << heading << ", "
+            << "dist=" << dist << ", "
+            << "vel=" << vel << std::endl;*/
+
+      //std::cout << "ot: " << ot << std::endl;
       evalDB.push_back({vt, ot, heading, dist, vel});
       trajectory_list.push_back(xt);
     }
@@ -59,13 +71,13 @@ std::array<double, 4> DWA::CalcDynamicWindow(
   double v_max = std::min(model[0], x[3] + model[2] * DT);
   double w_min = std::max(-model[1], x[4] - model[3] * DT);
   double w_max = std::min(model[1], x[4] + model[3] * DT);
-  std::cout << "DT: "
+  /*std::cout << "DT: "
             << DT << std::endl;
   std::cout << "Dynamic Window: "
             << "v_min=" << v_min << ", "
             << "v_max=" << v_max << ", "
             << "w_min=" << w_min << ", "
-            << "w_max=" << w_max << std::endl;
+            << "w_max=" << w_max << std::endl;*/
   return {v_min, v_max, w_min, w_max};
 }
 
@@ -75,10 +87,12 @@ std::vector<std::array<double, 5>> DWA::GenerateTrajectory(
 {
   std::vector<std::array<double, 5>> trajectory;
   auto xt = x;
+  std::cout << "evaldt: " << evaldt << std::endl;
   for (double t = 0.0; t <= evaldt; t += DT) {
+    xt[2] = normalizeAngle(xt[2]);
     xt[0] += DT * std::cos(xt[2]) * vt;
     xt[1] += DT * std::sin(xt[2]) * vt;
-    xt[2] += DT * ot;
+    xt[2] += normalizeAngle(DT * ot);
     xt[3] = vt;
     xt[4] = ot;
     trajectory.push_back(xt);
@@ -108,7 +122,7 @@ double DWA::CalcDistEval(
     double dist = std::hypot(o[0] - x[0], o[1] - x[1]) - (R + robotR);
     if (dist < min_dist) {
       min_dist = dist;
-      std::cout << "dist: " << dist << std::endl;
+      //std::cout << "dist: " << dist << std::endl;
     }
   }
 
@@ -134,22 +148,30 @@ std::vector<double> DWA::SelectBestControl(
   const std::vector<std::array<double, 5>> & evalDB,
   const std::array<double, 4> & evalParam)
 {
-  double max_score = -100;
+  double max_score = -100000;
   std::vector<double> best_u{0.0, 0.0};
   
+  
   for (auto & e : evalDB) {
-    std::cout << "e: " << e[1] << std::endl;
+    /*std::cout << "score: "
+            << "heading=" << e[2] << ", "
+            << "dist=" << e[3] << ", "
+            << "vel=" << e[4] << ", "
+            << "v=" << e[0] << ", "
+            << "w=" << e[1] << ", " << std::endl;*/
+    //std::cout << "e: " << e[1] << std::endl;
     double score = evalParam[0] * e[2] +
       evalParam[1] * e[3] +
       evalParam[2] * e[4];
-      std::cout << "score: " << score << std::endl;
+      //std::cout << "score: " << score << std::endl;
     if (score > max_score) {
       max_score = score;
       best_u[0] = e[0];
       best_u[1] = e[1];
     }
-    std::cout << "best_u: " << best_u[1] << std::endl;
+    //std::cout << "best_u: " << best_u[1] << std::endl;
   }
+  //std::cout << "best_u: " << best_u[0] << best_u[1] << std::endl;
   return best_u;
 }
 
