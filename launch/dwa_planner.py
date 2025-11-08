@@ -24,6 +24,8 @@ def generate_launch_description():
         [FindPackageShare(package_name), "rviz", rviz_file_name]
     )
 
+    
+
     rviz_node = Node(
         package="rviz2",
         executable="rviz2",
@@ -79,6 +81,12 @@ def generate_launch_description():
         output="screen",
     )
 
+    lidar_waypoint_pub_node = Node(
+        package='path_smoother',
+        executable='waypoint_publisher',
+        output="screen",
+    )
+
     nodes = [
         rviz_node,
         robot_description_rviz_node,
@@ -86,7 +94,7 @@ def generate_launch_description():
         dwa_planner_node,
         odometry_pub_node,
         obstacle_pub_node,
-        waypoint_pub_node,
+        lidar_waypoint_pub_node,
     ]
 
     return LaunchDescription(nodes)

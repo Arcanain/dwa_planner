@@ -87,7 +87,7 @@ std::vector<std::array<double, 5>> DWA::GenerateTrajectory(
 {
   std::vector<std::array<double, 5>> trajectory;
   auto xt = x;
-  std::cout << "evaldt: " << evaldt << std::endl;
+  //std::cout << "evaldt: " << evaldt << std::endl;
   for (double t = 0.0; t <= evaldt; t += DT) {
     xt[2] = normalizeAngle(xt[2]);
     xt[0] += DT * std::cos(xt[2]) * vt;
@@ -122,7 +122,7 @@ double DWA::CalcDistEval(
     double dist = std::hypot(o[0] - x[0], o[1] - x[1]) - (R + robotR);
     if (dist < min_dist) {
       min_dist = dist;
-      //std::cout << "dist: " << dist << std::endl;
+      std::cout << "dist: " << dist << std::endl;
     }
   }
 
