@@ -20,6 +20,7 @@ find_package(std_msgs REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(ament_cmake_gtest REQUIRED)
+find_package(sensor_msgs REQUIRED)
 
 #==========================================================
 # ライブラリターゲットの定義
@@ -37,6 +38,7 @@ ament_target_dependencies(dwa_planner_library
   tf2_ros
   tf2_geometry_msgs
   std_msgs
+  sensor_msgs
 )
 target_include_directories(dwa_planner_library PUBLIC
   include

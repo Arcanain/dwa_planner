@@ -49,13 +49,16 @@ DWAPlannerNode::DWAPlannerNode()
     "/odom", 10,
     std::bind(&DWAPlannerNode::odomCallback, this, std::placeholders::_1));
 
-  local_obstacle_sub_ = create_subscription<visualization_msgs::msg::MarkerArray>(
+  /*local_obstacle_sub_ = create_subscription<visualization_msgs::msg::MarkerArray>(
     "local_obstacle_markers", 10,
-    std::bind(&DWAPlannerNode::local_obstacle_callback, this, std::placeholders::_1));
+    std::bind(&DWAPlannerNode::local_obstacle_callback, this, std::placeholders::_1));*/
 
   target_sub_ = create_subscription<geometry_msgs::msg::PoseStamped>(
     "waypoint", 10,
     std::bind(&DWAPlannerNode::target_callback, this, std::placeholders::_1));
+
+  scan_sub_ = create_subscription<sensor_msgs::msg::LaserScan>(
+      "/filtered_scan", 10, std::bind(&DWAPlannerNode::scanCallback, this, std::placeholders::_1));
 
   // Publisher
   cmd_vel_pub_ = create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
@@ -157,16 +160,20 @@ void DWAPlannerNode::odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg)
   }
 }
 
-void DWAPlannerNode::local_obstacle_callback(
-  const visualization_msgs::msg::MarkerArray::SharedPtr msg)
+void DWAPlannerNode::scanCallback(const sensor_msgs::msg::LaserScan::SharedPtr msg)
 {
   obstacle_.clear();
-  for (const auto & marker : msg->markers) {
-    if (marker.type == visualization_msgs::msg::Marker::CYLINDER) {
-      double ox = marker.pose.position.x;
-      double oy = marker.pose.position.y;
-      obstacle_.push_back({ox, oy});
-    }
+  double angle = msg->angle_min;
+  for (size_t i = 0; i < msg->ranges.size(); ++i)
+  {
+      float r = msg->ranges[i];
+      if (std::isfinite(r) && (r >= msg->range_min && r <= msg->range_max))
+      {
+          double ox = r * std::cos(angle) + x_[0];
+          double oy = r * std::sin(angle)+ x_[1];
+          obstacle_.push_back({ox, oy});
+      }
+      angle += msg->angle_increment;
   }
 
   if (!obstacle_.empty()) {
