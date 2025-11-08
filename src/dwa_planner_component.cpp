@@ -115,8 +115,13 @@ double DWA::CalcDistEval(
   double R,
   double robotR)
 {
+  // 障害物が存在しない場合
+  if (ob.empty()) {
+    std::cout << "no dist" << std::endl;
+    return 1000.0;  // 安全な大きな値を返す
+  }
   // double min_dist = std::numeric_limits<double>::infinity();
-  double min_dist = 1000;
+  double min_dist = 1000.0;
 
   for (const auto & o : ob) {
     double dist = std::hypot(o[0] - x[0], o[1] - x[1]) - (R + robotR);

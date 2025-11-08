@@ -83,12 +83,13 @@ void DWAPlannerNode::timerCallback()
       "Waiting for /odom...");
     return;
   }
+  /*
   if (!received_obstacles_) {
     RCLCPP_INFO_THROTTLE(
       get_logger(), *get_clock(), 2000,
       "Waiting for local_obstacle_markers...");
     return;
-  }
+  }*/
   if (!received_goal_) {
     RCLCPP_INFO_THROTTLE(
       get_logger(), *get_clock(), 2000,
