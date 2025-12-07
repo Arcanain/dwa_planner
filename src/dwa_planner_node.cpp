@@ -61,8 +61,9 @@ DWAPlannerNode::DWAPlannerNode()
       "/filtered_scan", 10, std::bind(&DWAPlannerNode::scanCallback, this, std::placeholders::_1));
 
   // Publisher
-  cmd_vel_pub_ = create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
+  cmd_vel_pub_ = create_publisher<geometry_msgs::msg::Twist>("/cmd_vel_tmp", 10);
   predict_path_pub = create_publisher<nav_msgs::msg::Path>("predict_path", 50);
+  bool_pub_ = create_publisher<std_msgs::msg::Bool>("dwa_active", 10);
 
 
   // Timer
@@ -96,6 +97,11 @@ void DWAPlannerNode::timerCallback()
       "Waiting for /waypoint...");
     return;
   }
+
+  std_msgs::msg::Bool flag_msg;
+  flag_msg.data = true;
+  bool_pub_->publish(flag_msg);
+
 
   // DWA計算
   auto result = DWA::DynamicWindowApproach(
