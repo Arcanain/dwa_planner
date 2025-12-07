@@ -1,10 +1,10 @@
 dwa_planner:
   ros__parameters:
     # kinematic: [max_vel, max_omega_deg, accel, accel_omega_deg, v_reso, w_reso_deg]
-    kinematic: [1.0, 300.0, 1.0, 150.0, 0.02, 0.5]
+    kinematic: [0.7, 300.0, 1.0, 140.0, 0.02, 0.5]
 
     # eval_param: [heading_gain, dist_gain, vel_gain, predict_dt]
-    eval_param: [0.3, 0.5, 0.6, 1.5]
+    eval_param: [0.2, 0.4, 0.5, 1.5]
     # 半径
-    robot_radius: 0.2
-    obstacle_radius: 0.05
+    robot_radius: 0.3
+    obstacle_radius: 0.1
