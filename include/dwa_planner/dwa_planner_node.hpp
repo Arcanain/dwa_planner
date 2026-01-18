@@ -11,6 +11,10 @@
 #include "nav_msgs/msg/odometry.hpp"
 #include "visualization_msgs/msg/marker_array.hpp"
 #include "tf2_ros/static_transform_broadcaster.h"
+#include <nav_msgs/msg/path.hpp>
+#include <sensor_msgs/msg/laser_scan.hpp>
+#include "std_msgs/msg/bool.hpp"
+
 
 namespace dwa_planner
 {
@@ -24,18 +28,22 @@ public:
 private:
   void timerCallback();
   void odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg);
-  void local_obstacle_callback(const visualization_msgs::msg::MarkerArray::SharedPtr msg);
+  void scanCallback(const sensor_msgs::msg::LaserScan::SharedPtr msg);
   void target_callback(const geometry_msgs::msg::PoseStamped::SharedPtr msg);
 
   void send_static_transform();
 
   // Subscriber
   rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_sub_;
-  rclcpp::Subscription<visualization_msgs::msg::MarkerArray>::SharedPtr local_obstacle_sub_;
+  //rclcpp::Subscription<visualization_msgs::msg::MarkerArray>::SharedPtr local_obstacle_sub_;
   rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr target_sub_;
+  rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr scan_sub_;
 
   // Publisher
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr cmd_vel_pub_;
+  rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr predict_path_pub;
+  rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr bool_pub_;
+
 
   // Timer
   rclcpp::TimerBase::SharedPtr timer_;
