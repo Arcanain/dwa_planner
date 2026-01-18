@@ -26,12 +26,13 @@ source ~/ros2_ws/install/setup.bash
 ros2 launch dwa_planner dwa_planner.py
 ```
 
-### Folder Structure
+### Directory
 ```
 dwa_planner/
-├── include/                               - Directory for header files
-│   └── pure_pursuit_planner/              - Header files for the pure_pursuit_planner package
-│       └── pure_pursuit_planner_component.hpp - Header file for the Pure Pursuit planner component
+├── CMakeLists.txt                         - CMake build configuration file for the DWA planner
+├── package.xml                            - ROS 2 package metadata file
+├── config/                                - Directory for YAML parameter/config files
+│   └── dwa_params.yaml                    - YAML file specifying DWA parameters (max_vel, etc.)
 ├── launch/                                - Directory for ROS 2 launch files
 │   └── dwa_planner.py            - Launch script for the pure_pursuit_planner node
 ├── rviz/                                  - Directory for RViz configuration files
