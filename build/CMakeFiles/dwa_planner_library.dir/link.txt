@@ -1,2 +1,0 @@
-/usr/bin/ar qc libdwa_planner_library.a CMakeFiles/dwa_planner_library.dir/src/dwa_planner_node.cpp.o CMakeFiles/dwa_planner_library.dir/src/dwa_planner_component.cpp.o
-/usr/bin/ranlib libdwa_planner_library.a
