@@ -49,19 +49,21 @@ def generate_launch_description():
         output='both',
         parameters=[{'joint_state_publisher': robot_description}]
     )
-
+    '''
     dwa_planner_node = Node(
         package=package_name,
         executable='dwa_planner',
         output="screen",
         parameters=['config/params.yaml'],
     )
+    '''
     dwa_planner_node = Node(
         package=package_name,
         executable='dwa_planner',
         output="screen",
         parameters=[dwa_params],
     )
+    
 
     odometry_pub_node = Node(
         package=simulator_package,
@@ -94,7 +96,7 @@ def generate_launch_description():
         dwa_planner_node,
         odometry_pub_node,
         obstacle_pub_node,
-        path_waypoint_pub_node,
+        waypoint_pub_node,
     ]
 
     return LaunchDescription(nodes)

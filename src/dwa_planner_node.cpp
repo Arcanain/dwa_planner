@@ -49,9 +49,9 @@ DWAPlannerNode::DWAPlannerNode()
     "/odom", 10,
     std::bind(&DWAPlannerNode::odomCallback, this, std::placeholders::_1));
 
-  /*local_obstacle_sub_ = create_subscription<visualization_msgs::msg::MarkerArray>(
-    "local_obstacle_markers", 10,
-    std::bind(&DWAPlannerNode::local_obstacle_callback, this, std::placeholders::_1));*/
+  local_obstacle_sub_ = create_subscription<visualization_msgs::msg::MarkerArray>(
+    "global_obstacle_markers", 10,
+    std::bind(&DWAPlannerNode::local_obstacle_callback, this, std::placeholders::_1));
 
   target_sub_ = create_subscription<geometry_msgs::msg::PoseStamped>(
     "waypoint", 10,
@@ -61,7 +61,9 @@ DWAPlannerNode::DWAPlannerNode()
       "/filtered_scan", 10, std::bind(&DWAPlannerNode::scanCallback, this, std::placeholders::_1));
 
   // Publisher
-  cmd_vel_pub_ = create_publisher<geometry_msgs::msg::Twist>("/cmd_vel_tmp", 10);
+  //cmd_vel_pub_ = create_publisher<geometry_msgs::msg::Twist>("/cmd_vel_tmp", 10);
+  cmd_vel_pub_ = create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
+  
   predict_path_pub = create_publisher<nav_msgs::msg::Path>("predict_path", 50);
   bool_pub_ = create_publisher<std_msgs::msg::Bool>("dwa_active", 10);
 
@@ -183,6 +185,17 @@ void DWAPlannerNode::scanCallback(const sensor_msgs::msg::LaserScan::SharedPtr m
       angle += msg->angle_increment;
   }
 
+  if (!obstacle_.empty()) {
+    received_obstacles_ = true;
+  }
+}
+
+void DWAPlannerNode::local_obstacle_callback(const visualization_msgs::msg::MarkerArray::SharedPtr msg)
+{
+  obstacle_.clear();
+  for (const auto & marker : msg->markers) {
+    obstacle_.push_back({marker.pose.position.x, marker.pose.position.y});
+  }
   if (!obstacle_.empty()) {
     received_obstacles_ = true;
   }
