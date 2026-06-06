@@ -6,6 +6,9 @@
 #include <string>
 
 #include "rclcpp/rclcpp.hpp"
+#include "rclcpp_lifecycle/lifecycle_node.hpp"
+#include "rclcpp_lifecycle/lifecycle_publisher.hpp"
+#include "lifecycle_msgs/msg/state.hpp"
 #include "geometry_msgs/msg/twist.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "nav_msgs/msg/odometry.hpp"
@@ -19,11 +22,20 @@
 namespace dwa_planner
 {
 
-class DWAPlannerNode : public rclcpp::Node
+using CallbackReturn = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
+
+class DWAPlannerNode : public rclcpp_lifecycle::LifecycleNode
 {
 public:
   DWAPlannerNode();
   ~DWAPlannerNode() = default;
+
+  // Lifecycle transitions
+  CallbackReturn on_configure(const rclcpp_lifecycle::State & state) override;
+  CallbackReturn on_activate(const rclcpp_lifecycle::State & state) override;
+  CallbackReturn on_deactivate(const rclcpp_lifecycle::State & state) override;
+  CallbackReturn on_cleanup(const rclcpp_lifecycle::State & state) override;
+  CallbackReturn on_shutdown(const rclcpp_lifecycle::State & state) override;
 
 private:
   void timerCallback();
@@ -33,6 +45,7 @@ private:
   void target_callback(const geometry_msgs::msg::PoseStamped::SharedPtr msg);
 
   void send_static_transform();
+  void publishStopCommand();
 
   // Subscriber
   rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_sub_;
@@ -40,10 +53,10 @@ private:
   rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr target_sub_;
   rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr scan_sub_;
 
-  // Publisher
-  rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr cmd_vel_pub_;
-  rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr predict_path_pub;
-  rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr bool_pub_;
+  // Publisher (Lifecycle)
+  rclcpp_lifecycle::LifecyclePublisher<geometry_msgs::msg::Twist>::SharedPtr cmd_vel_pub_;
+  rclcpp_lifecycle::LifecyclePublisher<nav_msgs::msg::Path>::SharedPtr predict_path_pub;
+  rclcpp_lifecycle::LifecyclePublisher<std_msgs::msg::Bool>::SharedPtr bool_pub_;
 
 
   // Timer

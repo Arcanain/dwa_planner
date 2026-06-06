@@ -13,6 +13,8 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs -ftest-cove
 #==========================================================
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rclcpp_lifecycle REQUIRED)
+find_package(lifecycle_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
@@ -32,6 +34,8 @@ add_library(dwa_planner_library
 )
 ament_target_dependencies(dwa_planner_library
   rclcpp
+  rclcpp_lifecycle
+  lifecycle_msgs
   geometry_msgs
   nav_msgs
   visualization_msgs

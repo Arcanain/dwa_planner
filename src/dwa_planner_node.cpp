@@ -13,18 +13,25 @@ namespace dwa_planner
 
 // constructor
 DWAPlannerNode::DWAPlannerNode()
-: Node("dwa_planner"),
+: rclcpp_lifecycle::LifecycleNode("dwa_planner"),
   x_{0.0, 0.0, 0.0, 0.0, 0.0},
   goal_{0.0, 0.0},
+  robot_radius_(0.0),
+  obstacle_radius_(0.0),
   received_obstacles_(false),
   received_goal_(false),
   received_odom_(false)
 {
-  // デフォルト値を宣言
+  // パラメータ宣言のみ。実体生成は on_configure() で行う
   this->declare_parameter<std::vector<double>>("kinematic", {0.5, 20.0, 0.1, 50.0, 0.01, 1.0});
   this->declare_parameter<std::vector<double>>("eval_param", {0.1, 0.08, 0.1, 3.0});
   this->declare_parameter<double>("robot_radius", 0.3);
   this->declare_parameter<double>("obstacle_radius", 0.3);
+}
+
+CallbackReturn DWAPlannerNode::on_configure(const rclcpp_lifecycle::State & /*state*/)
+{
+  RCLCPP_INFO(get_logger(), "on_configure: configuring DWA planner");
 
   // YAML から取得
   std::vector<double> kin_vec, eval_vec;
@@ -32,6 +39,12 @@ DWAPlannerNode::DWAPlannerNode()
   this->get_parameter("eval_param", eval_vec);
   this->get_parameter("robot_radius", robot_radius_);
   this->get_parameter("obstacle_radius", obstacle_radius_);
+
+  if (kin_vec.size() < 6 || eval_vec.size() < 4) {
+    RCLCPP_ERROR(get_logger(), "Parameter size mismatch: kinematic=%zu (need 6), eval_param=%zu (need 4)",
+                 kin_vec.size(), eval_vec.size());
+    return CallbackReturn::FAILURE;
+  }
 
   // 配列に詰め替え（角度はマクロで変換）
   kinematic_[0] = kin_vec[0];
@@ -45,7 +58,7 @@ DWAPlannerNode::DWAPlannerNode()
     eval_param_[i] = eval_vec[i];
   }
 
-  // Subscriber
+  // Subscriber: Inactive 中も状態更新を続けるため on_configure で作る
   odom_sub_ = create_subscription<nav_msgs::msg::Odometry>(
     "/odom", 10,
     std::bind(&DWAPlannerNode::odomCallback, this, std::placeholders::_1));
@@ -59,24 +72,117 @@ DWAPlannerNode::DWAPlannerNode()
     std::bind(&DWAPlannerNode::target_callback, this, std::placeholders::_1));
 
   scan_sub_ = create_subscription<sensor_msgs::msg::LaserScan>(
-      "/filtered_scan", 10, std::bind(&DWAPlannerNode::scanCallback, this, std::placeholders::_1));
+    "/filtered_scan", 10,
+    std::bind(&DWAPlannerNode::scanCallback, this, std::placeholders::_1));
 
-  // Publisher
-  //cmd_vel_pub_ = create_publisher<geometry_msgs::msg::Twist>("/cmd_vel_tmp", 10);
+  // Publisher (Lifecycle 版)
   cmd_vel_pub_ = create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
-  
   predict_path_pub = create_publisher<nav_msgs::msg::Path>("predict_path", 50);
   bool_pub_ = create_publisher<std_msgs::msg::Bool>("dwa_active", 10);
 
-
-  // Timer
+  // Timer: 生成後すぐに停止しておき、on_activate で再開する
   timer_ = create_wall_timer(
     std::chrono::milliseconds(100),
     std::bind(&DWAPlannerNode::timerCallback, this));
+  timer_->cancel();
 
-  // TF
+  // 静的 TF はラッチされるので configure 時に一度だけ送る
   static_broadcaster_ = std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);
   send_static_transform();
+
+  return CallbackReturn::SUCCESS;
+}
+
+CallbackReturn DWAPlannerNode::on_activate(const rclcpp_lifecycle::State & /*state*/)
+{
+  RCLCPP_INFO(get_logger(), "on_activate: activating DWA planner");
+
+  // LifecyclePublisher を有効化（publish() が実際に送信されるようになる）
+  cmd_vel_pub_->on_activate();
+  predict_path_pub->on_activate();
+  bool_pub_->on_activate();
+
+  // 稼働中フラグを発信
+  std_msgs::msg::Bool flag_msg;
+  flag_msg.data = true;
+  bool_pub_->publish(flag_msg);
+
+  // タイマ再開（10Hz で DWA 計算を開始）
+  timer_->reset();
+
+  return CallbackReturn::SUCCESS;
+}
+
+CallbackReturn DWAPlannerNode::on_deactivate(const rclcpp_lifecycle::State & /*state*/)
+{
+  RCLCPP_INFO(get_logger(), "on_deactivate: deactivating DWA planner");
+
+  // まずタイマを止めて DWA 計算を停止
+  if (timer_) {
+    timer_->cancel();
+  }
+
+  // 安全停止: ゼロ速度と非稼働フラグを送ってから publisher を deactivate する
+  publishStopCommand();
+
+  std_msgs::msg::Bool flag_msg;
+  flag_msg.data = false;
+  bool_pub_->publish(flag_msg);
+
+  cmd_vel_pub_->on_deactivate();
+  predict_path_pub->on_deactivate();
+  bool_pub_->on_deactivate();
+
+  return CallbackReturn::SUCCESS;
+}
+
+CallbackReturn DWAPlannerNode::on_cleanup(const rclcpp_lifecycle::State & /*state*/)
+{
+  RCLCPP_INFO(get_logger(), "on_cleanup: cleaning up DWA planner");
+
+  timer_.reset();
+  cmd_vel_pub_.reset();
+  predict_path_pub.reset();
+  bool_pub_.reset();
+  odom_sub_.reset();
+  local_obstacle_sub_.reset();
+  target_sub_.reset();
+  scan_sub_.reset();
+  static_broadcaster_.reset();
+
+  obstacle_.clear();
+  x_ = {0.0, 0.0, 0.0, 0.0, 0.0};
+  goal_ = {0.0, 0.0};
+  received_obstacles_ = false;
+  received_goal_ = false;
+  received_odom_ = false;
+
+  return CallbackReturn::SUCCESS;
+}
+
+CallbackReturn DWAPlannerNode::on_shutdown(const rclcpp_lifecycle::State & state)
+{
+  RCLCPP_INFO(get_logger(), "on_shutdown: shutting down DWA planner");
+
+  // Active 状態からの shutdown では deactivate 相当の処理を行う
+  if (state.id() == lifecycle_msgs::msg::State::PRIMARY_STATE_ACTIVE) {
+    if (timer_) {
+      timer_->cancel();
+    }
+    publishStopCommand();
+    if (cmd_vel_pub_) cmd_vel_pub_->on_deactivate();
+    if (predict_path_pub) predict_path_pub->on_deactivate();
+    if (bool_pub_) bool_pub_->on_deactivate();
+  }
+
+  return on_cleanup(state);
+}
+
+void DWAPlannerNode::publishStopCommand()
+{
+  if (!cmd_vel_pub_) return;
+  geometry_msgs::msg::Twist stop_cmd;  // 全ゼロ
+  cmd_vel_pub_->publish(stop_cmd);
 }
 
 void DWAPlannerNode::timerCallback()
