@@ -11,6 +11,7 @@
 namespace dwa_planner
 {
 
+// constructor
 DWAPlannerNode::DWAPlannerNode()
 : Node("dwa_planner"),
   x_{0.0, 0.0, 0.0, 0.0, 0.0},
