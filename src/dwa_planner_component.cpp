@@ -127,7 +127,7 @@ double DWA::CalcDistEval(
     double dist = std::hypot(o[0] - x[0], o[1] - x[1]) - (R + robotR);
     if (dist < min_dist) {
       min_dist = dist;
-      std::cout << "dist: " << dist << std::endl;
+      //std::cout << "dist: " << dist << std::endl;
     }
   }
 

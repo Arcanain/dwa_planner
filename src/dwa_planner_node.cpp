@@ -79,6 +79,7 @@ CallbackReturn DWAPlannerNode::on_configure(const rclcpp_lifecycle::State & /*st
   cmd_vel_pub_ = create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
   predict_path_pub = create_publisher<nav_msgs::msg::Path>("predict_path", 50);
   bool_pub_ = create_publisher<std_msgs::msg::Bool>("dwa_active", 10);
+  goal_marker_pub_ = create_publisher<visualization_msgs::msg::Marker>("dwa_goal_marker", 10);
 
   // Timer: 生成後すぐに停止しておき、on_activate で再開する
   timer_ = create_wall_timer(
@@ -101,6 +102,7 @@ CallbackReturn DWAPlannerNode::on_activate(const rclcpp_lifecycle::State & /*sta
   cmd_vel_pub_->on_activate();
   predict_path_pub->on_activate();
   bool_pub_->on_activate();
+  goal_marker_pub_->on_activate();
 
   // 稼働中フラグを発信
   std_msgs::msg::Bool flag_msg;
@@ -132,6 +134,7 @@ CallbackReturn DWAPlannerNode::on_deactivate(const rclcpp_lifecycle::State & /*s
   cmd_vel_pub_->on_deactivate();
   predict_path_pub->on_deactivate();
   bool_pub_->on_deactivate();
+  goal_marker_pub_->on_deactivate();
 
   return CallbackReturn::SUCCESS;
 }
@@ -144,6 +147,7 @@ CallbackReturn DWAPlannerNode::on_cleanup(const rclcpp_lifecycle::State & /*stat
   cmd_vel_pub_.reset();
   predict_path_pub.reset();
   bool_pub_.reset();
+  goal_marker_pub_.reset();
   odom_sub_.reset();
   local_obstacle_sub_.reset();
   target_sub_.reset();
@@ -226,8 +230,26 @@ void DWAPlannerNode::timerCallback()
   geometry_msgs::msg::Twist cmd;
   cmd.linear.x = result.control[0];
   cmd.angular.z = result.control[1];
-  RCLCPP_INFO(get_logger(), "cmd_vel: (%.2f, %.2f)", cmd.linear.x, cmd.angular.z);
+  //RCLCPP_INFO(get_logger(), "cmd_vel: (%.2f, %.2f)", cmd.linear.x, cmd.angular.z);
   cmd_vel_pub_->publish(cmd);
+
+  // 目標点を赤いSphereマーカーで可視化
+  {
+    visualization_msgs::msg::Marker marker;
+    marker.header.frame_id = "odom";
+    marker.header.stamp = now();
+    marker.ns = "dwa_goal";
+    marker.id = 0;
+    marker.type = visualization_msgs::msg::Marker::SPHERE;
+    marker.action = visualization_msgs::msg::Marker::ADD;
+    marker.pose.position.x = goal_[0];
+    marker.pose.position.y = goal_[1];
+    marker.pose.position.z = 0.0;
+    marker.pose.orientation.w = 1.0;
+    marker.scale.x = marker.scale.y = marker.scale.z = 0.4;
+    marker.color.r = 1.0; marker.color.g = 0.0; marker.color.b = 0.0; marker.color.a = 1.0;
+    goal_marker_pub_->publish(marker);
+  }
 
   // --- 軌跡をパスとして可視化 ---
   nav_msgs::msg::Path all_traj_path;
@@ -313,7 +335,7 @@ void DWAPlannerNode::target_callback(const geometry_msgs::msg::PoseStamped::Shar
   goal_[0] = msg->pose.position.x;
   goal_[1] = msg->pose.position.y;
 
-  RCLCPP_INFO(get_logger(), "New goal set: (%.2f, %.2f)", goal_[0], goal_[1]);
+  //RCLCPP_INFO(get_logger(), "New goal set: (%.2f, %.2f)", goal_[0], goal_[1]);
 
   if (!goal_.empty()) {
     received_goal_ = true;
