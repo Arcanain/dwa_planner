@@ -6,7 +6,8 @@ from launch.substitutions import PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
-from launch.actions import IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 from launch.substitutions import LaunchConfiguration, TextSubstitution
@@ -114,23 +115,18 @@ def generate_launch_description():
         output="screen",
     )
 
-    obstacle_pub_node = Node(
-        package=simulator_package,
-        executable='obstacle_pub',
-        output="screen",
+    # path_smoother/waypoint_pubに渡すCSVのパス
+    path_csv = os.path.expanduser(
+        '~/ros2_ws/src/path_smoother/path/tsukuba_1004_gnss_01.csv'
     )
 
     waypoint_pub_node = Node(
-        package=simulator_package,
-        executable='waypoint_pub',
-        output="screen",
-    )
-
-    lidar_waypoint_pub_node = Node(
         package='path_smoother',
         executable='waypoint_publisher',
         output="screen",
+        parameters=[{'path_file': path_csv}],
     )
+
 
     nodes = [
         dummy_node,
@@ -143,7 +139,7 @@ def generate_launch_description():
         rtk_judge_node,
         dwa_planner_node,
         odometry_pub_node,
-        lidar_waypoint_pub_node,
+        waypoint_pub_node,
     ]
 
     return LaunchDescription(nodes)

@@ -63,6 +63,7 @@ DWAPlannerNode::DWAPlannerNode()
   // Publisher
   cmd_vel_pub_ = create_publisher<geometry_msgs::msg::Twist>("/cmd_vel_tmp", 10);
   predict_path_pub = create_publisher<nav_msgs::msg::Path>("predict_path", 50);
+  best_path_pub = create_publisher<nav_msgs::msg::Path>("best_path", 10);
   bool_pub_ = create_publisher<std_msgs::msg::Bool>("dwa_active", 10);
 
 
@@ -145,6 +146,22 @@ void DWAPlannerNode::timerCallback()
 
   // --- 軌跡群を publish ---
   predict_path_pub->publish(all_traj_path);
+
+  // --- 最適制御の軌跡を publish ---
+  nav_msgs::msg::Path best_path;
+  best_path.header.stamp = now();
+  best_path.header.frame_id = "odom";
+  for (const auto &state : DWA::GenerateTrajectory(x_, cmd.linear.x, cmd.angular.z, eval_param_[3])) {
+    geometry_msgs::msg::PoseStamped pose;
+    pose.header = best_path.header;
+    pose.pose.position.x = state[0];
+    pose.pose.position.y = state[1];
+    tf2::Quaternion q;
+    q.setRPY(0, 0, state[2]);
+    pose.pose.orientation = tf2::toMsg(q);
+    best_path.poses.push_back(pose);
+  }
+  best_path_pub->publish(best_path);
 }
 
 void DWAPlannerNode::odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg)

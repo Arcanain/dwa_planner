@@ -42,6 +42,7 @@ private:
   // Publisher
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr cmd_vel_pub_;
   rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr predict_path_pub;
+  rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr best_path_pub;
   rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr bool_pub_;
 
 
