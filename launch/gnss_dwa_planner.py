@@ -5,6 +5,7 @@ from launch.substitutions import PathJoinSubstitution
 
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 
 from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
@@ -21,21 +22,32 @@ def generate_launch_description():
     lidar_dir = get_package_share_directory('sllidar_ros2')
     filter_dir = get_package_share_directory('lidar_based_obstacle_detection')
 
-    use_sim_time = LaunchConfiguration('use_sim_time', default='true')
-
+    # sllidar_node + base_link->laser の static TF
     lidar_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(lidar_dir, 'launch', 'sllidar_s2_launch.py')
-        ),
-        launch_arguments={'use_sim_time': use_sim_time}.items()
+        )
     )
 
-    filter_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(filter_dir, 'launch', 'lidar_based_obstacle_detection_launch.py')
-        ),
-        launch_arguments={'use_sim_time': use_sim_time}.items()
+    # /scan -> /filtered_scan（lidar_based_obstacle_detection_launch.py は rviz2 も起動するので Node を直接書く）
+    obstacle_detection_node = Node(
+        package='lidar_based_obstacle_detection',
+        executable='lidar_based_obstacle_detection_node',
+        name='lidar_based_obstacle_detection',
+        parameters=[os.path.join(filter_dir, 'config', 'params.yaml')],
+        output='screen',
     )
+
+
+    # waypoint_publisher の既定値と同じ CSV
+    default_path_csv = os.path.expanduser(
+            '~/ros2_ws/src/path_smoother/path/tsukuba_1004.csv'
+    )
+    path_csv_arg = DeclareLaunchArgument(
+            'path_csv',
+            default_value=default_path_csv,
+            description='Path to the CSV file for waypoint_publisher (tgt_path / waypoint)',
+        )
 
     dummy_node = Node(
         package='tf2_ros',
@@ -98,7 +110,7 @@ def generate_launch_description():
         executable='joint_state_publisher',
         name='joint_state_publisher',
         output='both',
-        parameters=[{'joint_state_publisher': robot_description}]
+        parameters=[{'robot_description': robot_description}]
     )
 
     dwa_planner_node = Node(
@@ -130,11 +142,14 @@ def generate_launch_description():
         package='path_smoother',
         executable='waypoint_publisher',
         output="screen",
+        parameters=[{'path_file': LaunchConfiguration('path_csv')}],
     )
 
     nodes = [
+        path_csv_arg,
         dummy_node,
-        filter_launch,
+        lidar_launch,
+        obstacle_detection_node,
         rviz_node,
         robot_description_rviz_node,
         joint_state_publisher_rviz_node,
