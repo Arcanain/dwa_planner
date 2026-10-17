@@ -118,7 +118,9 @@ void DWAPlannerNode::timerCallback()
   geometry_msgs::msg::Twist cmd;
   cmd.linear.x = result.control[0];
   cmd.angular.z = result.control[1];
-  RCLCPP_INFO(get_logger(), "cmd_vel: (%.2f, %.2f)", cmd.linear.x, cmd.angular.z);
+  RCLCPP_INFO_THROTTLE(get_logger(), *get_clock(), 500,
+  "cmd_vel: (%.2f, %.2f), candidates: %zu", cmd.linear.x, cmd.angular.z, result.trajectories.size());
+
   cmd_vel_pub_->publish(cmd);
 
   // --- 軌跡をパスとして可視化 ---
@@ -193,8 +195,8 @@ void DWAPlannerNode::scanCallback(const sensor_msgs::msg::LaserScan::SharedPtr m
       float r = msg->ranges[i];
       if (std::isfinite(r) && (r >= msg->range_min && r <= msg->range_max))
       {
-          double ox = r * std::cos(angle) + x_[0];
-          double oy = r * std::sin(angle)+ x_[1];
+          double ox = r * std::cos(angle + x_[2]) + x_[0];
+          double oy = r * std::sin(angle + x_[2]) + x_[1];
           obstacle_.push_back({ox, oy});
       }
       angle += msg->angle_increment;

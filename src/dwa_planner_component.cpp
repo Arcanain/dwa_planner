@@ -36,7 +36,11 @@ DWAResult DWA::DynamicWindowApproach(
       std::vector<std::array<double, 5>> xt = GenerateTrajectory(x, vt, ot, evalParam[3]);
 
       double heading = CalcHeadingEval(xt.back(), goal);
-      double dist = CalcDistEval(xt.back(), ob, R, robotR);
+      //double dist = CalcDistEval(xt.back(), ob, R, robotR);
+      double dist = 1000.0;
+      for (const auto & p : xt) {
+        dist = std::min(dist, CalcDistEval(p, ob, R, robotR));
+      }
       double vel = std::fabs(vt);
 
       if (dist < 0.05) {
@@ -117,7 +121,7 @@ double DWA::CalcDistEval(
 {
   // 障害物が存在しない場合
   if (ob.empty()) {
-    std::cout << "no dist" << std::endl;
+    //std::cout << "no dist" << std::endl;
     return 1000.0;  // 安全な大きな値を返す
   }
   // double min_dist = std::numeric_limits<double>::infinity();
@@ -127,7 +131,7 @@ double DWA::CalcDistEval(
     double dist = std::hypot(o[0] - x[0], o[1] - x[1]) - (R + robotR);
     if (dist < min_dist) {
       min_dist = dist;
-      std::cout << "dist: " << dist << std::endl;
+      //std::cout << "dist: " << dist << std::endl;
     }
   }
 
